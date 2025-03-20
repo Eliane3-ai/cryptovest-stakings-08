@@ -9,7 +9,7 @@ interface TokenCardProps {
   balance: number;
   usdValue: number;
   iconColor: string;
-  iconComponent: string; // Changed from icon: React.ReactNode to iconComponent: string
+  iconComponent: string;
   className?: string;
 }
 
@@ -22,8 +22,10 @@ const TokenCard: React.FC<TokenCardProps> = ({
   iconComponent,
   className,
 }) => {
-  // Dynamically render the icon based on the iconComponent string
-  const IconComponent = LucideIcons[iconComponent as keyof typeof LucideIcons];
+  // Get the icon component from Lucide icons safely
+  const IconComponent = iconComponent in LucideIcons 
+    ? LucideIcons[iconComponent as keyof typeof LucideIcons] 
+    : LucideIcons.Coins; // Fallback to Coins icon if not found
   
   return (
     <div className={cn(
