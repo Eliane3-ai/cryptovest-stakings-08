@@ -13,7 +13,6 @@ import {
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import WalletHeader from "@/components/WalletHeader";
-import WalletActions from "@/components/WalletActions";
 import TokenCard from "@/components/TokenCard";
 import TransactionItem, { TransactionType } from "@/components/TransactionItem";
 import StakingCard from "@/components/StakingCard";
@@ -247,7 +246,7 @@ const Index: React.FC = () => {
           
           {/* Main Content */}
           <div className="flex-1">
-            {/* Wallet Header */}
+            {/* Wallet Header with actions integrated */}
             <WalletHeader totalBalance={totalBalance} />
             
             {/* Trading View Widget (slideshow) */}
@@ -289,9 +288,6 @@ const Index: React.FC = () => {
                 ))}
               </div>
             )}
-            
-            {/* Wallet Action Buttons - NOW PLACED AFTER TOKENS */}
-            {activeTab === 'assets' && <WalletActions />}
             
             {/* Transactions Tab */}
             {activeTab === 'transactions' && (

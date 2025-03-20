@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { cn } from "@/lib/utils";
-import { Wallet, ChevronDown, ArrowDownToLine, ArrowUpFromLine, Trophy, MessageCircle } from "lucide-react";
+import { Wallet, ChevronDown, ArrowDownToLine, ArrowUpFromLine, Trophy, MessageCircle, Repeat } from "lucide-react";
+import WalletActions from "@/components/WalletActions";
 
 interface WalletHeaderProps {
   totalBalance: number;
@@ -22,6 +23,11 @@ const WalletHeader: React.FC<WalletHeaderProps> = ({ totalBalance, className }) 
       <div className="mt-4">
         <p className="text-sm font-medium text-muted-foreground mb-1">Total Balance</p>
         <h1 className="text-4xl font-bold tracking-tight">${totalBalance.toLocaleString()}</h1>
+      </div>
+      
+      {/* Wallet Action Buttons moved below total balance display */}
+      <div className="mt-6">
+        <WalletActions />
       </div>
     </div>
   );
