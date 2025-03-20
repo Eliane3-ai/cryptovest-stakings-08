@@ -7,9 +7,12 @@ import AssetsList from "@/components/AssetsList";
 import TransactionsList from "@/components/TransactionsList";
 import StakingSection from "@/components/StakingSection";
 import LiveMarketView from "@/components/LiveMarketView";
-import WalletActions from "@/components/WalletActions";
 import { useWalletData } from "@/hooks/useWalletData";
 import { useChatContext } from "@/contexts/ChatContext";
+import WithdrawDialog from "@/components/dialogs/WithdrawDialog";
+import DepositDialog from "@/components/dialogs/DepositDialog";
+import GasFeeTopUpDialog from "@/components/dialogs/GasFeeTopUpDialog";
+import { useState } from "react";
 
 const Index: React.FC = () => {
   const { 
@@ -22,6 +25,9 @@ const Index: React.FC = () => {
   } = useWalletData();
   
   const { chatOpen } = useChatContext();
+  const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
+  const [depositDialogOpen, setDepositDialogOpen] = useState(false);
+  const [topUpDialogOpen, setTopUpDialogOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#0B0E11] text-white">
@@ -34,11 +40,6 @@ const Index: React.FC = () => {
           {/* Wallet Header with actions integrated */}
           <WalletHeader totalBalance={totalBalance} />
           
-          {/* Action Buttons (without chat and winners buttons) */}
-          <div className="mb-6">
-            <WalletActions />
-          </div>
-          
           {/* Live Market View */}
           <LiveMarketView />
           
@@ -50,6 +51,35 @@ const Index: React.FC = () => {
           {activeTab === 'transactions' && <TransactionsList transactions={transactions} />}
           {activeTab === 'staking' && <StakingSection stakingOptions={stakingOptions} />}
         </div>
+
+        {/* Hidden button triggers for dialogs */}
+        <button 
+          id="withdraw-dialog-trigger" 
+          className="hidden"
+          onClick={() => setWithdrawDialogOpen(true)}
+        />
+        <button 
+          id="deposit-dialog-trigger" 
+          className="hidden"
+          onClick={() => setDepositDialogOpen(true)}
+        />
+        
+        {/* Dialogs */}
+        <WithdrawDialog 
+          open={withdrawDialogOpen} 
+          onOpenChange={setWithdrawDialogOpen}
+          onShowTopUp={() => setTopUpDialogOpen(true)}
+        />
+        
+        <DepositDialog 
+          open={depositDialogOpen} 
+          onOpenChange={setDepositDialogOpen} 
+        />
+        
+        <GasFeeTopUpDialog 
+          open={topUpDialogOpen} 
+          onOpenChange={setTopUpDialogOpen} 
+        />
       </div>
     </div>
   );

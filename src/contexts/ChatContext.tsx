@@ -7,7 +7,7 @@ interface ChatContextType {
   users: ChatUser[];
   messages: ChatMessage[];
   isLoading: boolean;
-  sendMessage: (message: string, media?: { type: 'image' | 'video'; url: string }) => void;
+  sendMessage: (message: string, media?: { type: 'image' | 'video'; url: string }, replyToId?: string | null) => void;
   sendPrivateMessage: (message: string, recipientId: string) => void;
   adminBot: ChatUser;
   chatOpen: boolean;
@@ -268,7 +268,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   }, [isLoading, users, activeUserIds, chatOpen, getAdminResponse]);
 
   // Send message to the chat (public)
-  const sendMessage = useCallback((messageText: string, media?: { type: 'image' | 'video'; url: string }) => {
+  const sendMessage = useCallback((messageText: string, media?: { type: 'image' | 'video'; url: string }, replyToId?: string | null) => {
     // Create a unique ID for current user (in a real app, this would be the actual user ID)
     const mockCurrentUserId = 'current-user';
     
@@ -278,7 +278,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       message: messageText,
       timestamp: new Date(),
       type: 'general',
-      media
+      media,
+      replyToId
     };
     
     setMessages(prevMessages => {

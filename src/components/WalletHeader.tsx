@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { cn } from "@/lib/utils";
 import { Wallet, ChevronDown, AlertTriangle, Eye, EyeOff } from "lucide-react";
-import WalletActions from "@/components/WalletActions";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useGasFee } from '@/contexts/GasFeeContext';
 import { getTranslation } from '@/utils/translations';
+import ActionButtons from './wallet/ActionButtons';
 
 interface WalletHeaderProps {
   totalBalance: number;
@@ -138,9 +137,12 @@ const WalletHeader: React.FC<WalletHeaderProps> = ({ totalBalance, className }) 
         </div>
       </div>
       
-      {/* Wallet Action Buttons below total balance display */}
+      {/* Action Buttons (Withdraw/Deposit) */}
       <div className="mt-6">
-        <WalletActions />
+        <ActionButtons 
+          onWithdraw={() => document.getElementById('withdraw-dialog-trigger')?.click()}
+          onDeposit={() => document.getElementById('deposit-dialog-trigger')?.click()}
+        />
       </div>
     </div>
   );

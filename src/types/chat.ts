@@ -14,12 +14,13 @@ export interface ChatMessage {
   message: string;
   timestamp: Date;
   type: 'withdrawal' | 'deposit' | 'price' | 'news' | 'general';
-  media?: {
+  media?: { 
     type: 'image' | 'video';
     url: string;
   };
   isPrivate?: boolean;
   recipientId?: string;
+  replyToId?: string | null;
 }
 
 export interface ChatNotification {

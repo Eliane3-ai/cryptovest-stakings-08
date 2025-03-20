@@ -1,19 +1,25 @@
-
 import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MessageCircle, Send, Users, Image, X, BellDot } from 'lucide-react';
+import { MessageCircle, Send, Users, Image, X, BellDot, Smile, Reply } from 'lucide-react';
 import { useChatContext } from '@/contexts/ChatContext';
 import ChatMessages from '@/components/ChatMessages';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface ChatProps {
   className?: string;
 }
+
+const commonEmojis = [
+  '😀', '😁', '😂', '🤣', '😊', '😍', '🥰', '😘', '👍', '🙌', 
+  '👏', '🔥', '💯', '✅', '⭐', '🎉', '🚀', '💰', '💎', '🤑',
+  '👑', '🌟', '💪', '🙏', '❤️', '💙', '💚', '💛', '🧡', '💜'
+];
 
 const Chat: React.FC<ChatProps> = ({ className = '' }) => {
   const { 
@@ -33,8 +39,10 @@ const Chat: React.FC<ChatProps> = ({ className = '' }) => {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [showPrivateChat, setShowPrivateChat] = useState(false);
   const [privateMessage, setPrivateMessage] = useState('');
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,10 +56,11 @@ const Chat: React.FC<ChatProps> = ({ className = '' }) => {
       media = { type: 'video' as const, url: selectedVideo };
     }
     
-    sendMessage(inputValue, media);
+    sendMessage(inputValue, media, replyingTo);
     setInputValue('');
     setSelectedImage(null);
     setSelectedVideo(null);
+    setReplyingTo(null);
   };
 
   const handleSendPrivateMessage = (e: React.FormEvent) => {
@@ -99,6 +108,27 @@ const Chat: React.FC<ChatProps> = ({ className = '' }) => {
     setIsExpanded(!isExpanded);
   };
 
+  const handleEmojiClick = (emoji: string) => {
+    setInputValue(prev => prev + emoji);
+    // Focus back on input after selecting emoji
+    inputRef.current?.focus();
+  };
+
+  const handleReplySwipe = (messageId: string) => {
+    setReplyingTo(messageId);
+    // Focus on input field after setting reply
+    inputRef.current?.focus();
+  };
+
+  const cancelReply = () => {
+    setReplyingTo(null);
+  };
+
+  const getReplyingToMessage = () => {
+    if (!replyingTo) return null;
+    return messages.find(m => m.id === replyingTo);
+  };
+
   const formatTimeAgo = (date: Date) => {
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
@@ -108,6 +138,8 @@ const Chat: React.FC<ChatProps> = ({ className = '' }) => {
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
     return format(date, 'MMM dd');
   };
+
+  const replyMessage = getReplyingToMessage();
 
   return (
     <>
@@ -215,9 +247,31 @@ const Chat: React.FC<ChatProps> = ({ className = '' }) => {
             <ChatMessages 
               maxHeight={isExpanded ? '420px' : '280px'} 
               className="rounded-none"
+              onReplySwipe={handleReplySwipe}
             />
           </CardContent>
           <CardFooter className="p-3 border-t flex-col items-stretch">
+            {replyMessage && (
+              <div className="mb-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-md flex items-start">
+                <div className="flex-1 text-xs text-gray-600 dark:text-gray-400 border-l-2 border-[#F0B90B] pl-2">
+                  <div className="font-semibold">
+                    Replying to {replyMessage.userId === adminBot.id ? adminBot.name : 
+                    replyMessage.userId === 'current-user' ? 'yourself' : 
+                    users.find(u => u.id === replyMessage.userId)?.name || 'User'}
+                  </div>
+                  <div className="truncate">{replyMessage.message}</div>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="p-1 h-auto"
+                  onClick={cancelReply}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+            
             {(selectedImage || selectedVideo) && (
               <div className="relative mb-2 border rounded p-2">
                 <button 
@@ -242,13 +296,16 @@ const Chat: React.FC<ChatProps> = ({ className = '' }) => {
                 )}
               </div>
             )}
+            
             <form onSubmit={handleSendMessage} className="flex w-full gap-2">
               <Input
+                ref={inputRef}
                 placeholder="Type your message..."
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 className="flex-1"
               />
+              
               <input
                 type="file"
                 ref={fileInputRef}
@@ -256,6 +313,35 @@ const Chat: React.FC<ChatProps> = ({ className = '' }) => {
                 accept="image/*,video/*"
                 className="hidden"
               />
+              
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-[#F0B90B]"
+                  >
+                    <Smile className="h-4 w-4" />
+                    <span className="sr-only">Add emoji</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-2">
+                  <div className="grid grid-cols-6 gap-1">
+                    {commonEmojis.map(emoji => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        onClick={() => handleEmojiClick(emoji)}
+                        className="text-xl p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+              
               <Button 
                 type="button" 
                 variant="outline" 
@@ -266,6 +352,7 @@ const Chat: React.FC<ChatProps> = ({ className = '' }) => {
                 <Image className="h-4 w-4" />
                 <span className="sr-only">Attach media</span>
               </Button>
+              
               <Button type="submit" size="sm" className="bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black">
                 <Send className="h-4 w-4" />
                 <span className="sr-only">Send</span>

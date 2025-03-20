@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trophy, Star, Award, Users } from 'lucide-react';
@@ -23,14 +22,14 @@ const WinnersPage: React.FC = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
   
-  // Mock data for winners
+  // Mock data for winners with updated amounts
   const winners: Winner[] = [
     {
       id: '1',
       name: 'James Wilson',
       avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
       country: 'UK',
-      amount: '12,500',
+      amount: '150,500',
       currency: 'USDT',
       date: '2 days ago'
     },
@@ -39,7 +38,7 @@ const WinnersPage: React.FC = () => {
       name: 'Sophia Chen',
       avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
       country: 'Singapore',
-      amount: '8,750',
+      amount: '142,750',
       currency: 'USDT',
       date: '3 days ago'
     },
@@ -48,7 +47,7 @@ const WinnersPage: React.FC = () => {
       name: 'Carlos Rodriguez',
       avatar: 'https://randomuser.me/api/portraits/men/67.jpg',
       country: 'Spain',
-      amount: '7,200',
+      amount: '137,200',
       currency: 'USDT',
       date: '4 days ago'
     },
@@ -57,7 +56,7 @@ const WinnersPage: React.FC = () => {
       name: 'Emma Thompson',
       avatar: 'https://randomuser.me/api/portraits/women/23.jpg',
       country: 'Australia',
-      amount: '6,500',
+      amount: '126,500',
       currency: 'USDT',
       date: '5 days ago'
     },
@@ -66,7 +65,7 @@ const WinnersPage: React.FC = () => {
       name: 'Akira Tanaka',
       avatar: 'https://randomuser.me/api/portraits/men/91.jpg',
       country: 'Japan',
-      amount: '5,800',
+      amount: '115,800',
       currency: 'USDT',
       date: '1 week ago'
     },
@@ -75,7 +74,7 @@ const WinnersPage: React.FC = () => {
       name: 'Maria Santos',
       avatar: 'https://randomuser.me/api/portraits/women/67.jpg',
       country: 'Brazil',
-      amount: '4,900',
+      amount: '104,900',
       currency: 'USDT',
       date: '1 week ago'
     },
@@ -84,7 +83,7 @@ const WinnersPage: React.FC = () => {
       name: 'Fatima Al-Farsi',
       avatar: 'https://randomuser.me/api/portraits/women/82.jpg',
       country: 'UAE',
-      amount: '4,300',
+      amount: '89,300',
       currency: 'USDT',
       date: '1 week ago'
     },
@@ -93,7 +92,7 @@ const WinnersPage: React.FC = () => {
       name: 'John Smith',
       avatar: 'https://randomuser.me/api/portraits/men/42.jpg',
       country: 'USA',
-      amount: '3,900',
+      amount: '72,900',
       currency: 'USDT',
       date: '2 weeks ago'
     }
