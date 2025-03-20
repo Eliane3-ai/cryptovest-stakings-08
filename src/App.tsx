@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { GasFeeProvider } from "./contexts/GasFeeContext";
+import { ChatProvider } from "./contexts/ChatContext";
 import Index from "./pages/Index";
 import Market from "./pages/Market";
 import Analytics from "./pages/Analytics";
@@ -21,23 +22,25 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
       <GasFeeProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/market" element={<Market />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/wallet-connect" element={<WalletConnect />} />
-              <Route path="/exchange" element={<Exchange />} />
-              <Route path="/deposit" element={<Deposit />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <ChatProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/market" element={<Market />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/wallet-connect" element={<WalletConnect />} />
+                <Route path="/exchange" element={<Exchange />} />
+                <Route path="/deposit" element={<Deposit />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </ChatProvider>
       </GasFeeProvider>
     </LanguageProvider>
   </QueryClientProvider>

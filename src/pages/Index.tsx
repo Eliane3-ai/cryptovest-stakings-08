@@ -7,6 +7,7 @@ import AssetsList from "@/components/AssetsList";
 import TransactionsList from "@/components/TransactionsList";
 import StakingSection from "@/components/StakingSection";
 import LiveMarketView from "@/components/LiveMarketView";
+import Chat from "@/components/Chat";
 import { useWalletData } from "@/hooks/useWalletData";
 
 const Index: React.FC = () => {
@@ -32,6 +33,11 @@ const Index: React.FC = () => {
           
           {/* Live Market View */}
           <LiveMarketView />
+          
+          {/* Live Chat */}
+          <div className="mb-6">
+            <Chat />
+          </div>
           
           {/* Tab Navigation */}
           <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} />
