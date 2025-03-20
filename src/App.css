@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -39,4 +40,75 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Binance-style CSS additions */
+.binance-theme {
+  --binance-yellow: #F0B90B;
+  --binance-black: #0B0E11;
+  --binance-dark-bg: #1E2026;
+  --binance-card-bg: #2B3139;
+  --binance-border: #474D57;
+  --binance-text-primary: #FFFFFF;
+  --binance-text-secondary: #848E9C;
+  --binance-green: #0ECB81;
+  --binance-red: #F6465D;
+  --binance-light-border: #E6E8EA;
+  --binance-light-bg: #F8FAFD;
+  --binance-light-text: #707A8A;
+}
+
+/* Balance container styles */
+.balance-container {
+  background-color: #FEF9E7;
+  border: 1px solid #F9E7A0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.dark .balance-container {
+  background-color: rgba(240, 185, 11, 0.1);
+  border-color: rgba(240, 185, 11, 0.2);
+}
+
+/* Binance-like button styles */
+.binance-button {
+  background-color: var(--binance-yellow);
+  color: var(--binance-black);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.binance-button:hover {
+  background-color: rgba(240, 185, 11, 0.9);
+}
+
+.binance-button-outline {
+  background-color: transparent;
+  border: 1px solid var(--binance-yellow);
+  color: var(--binance-yellow);
+}
+
+.binance-button-outline:hover {
+  background-color: rgba(240, 185, 11, 0.1);
+}
+
+/* Cryptocurrency card flash */
+@keyframes price-flash-up {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(14, 203, 129, 0.1); }
+}
+
+@keyframes price-flash-down {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(246, 70, 93, 0.1); }
+}
+
+.price-up {
+  animation: price-flash-up 0.5s ease-in-out;
+}
+
+.price-down {
+  animation: price-flash-down 0.5s ease-in-out;
 }
