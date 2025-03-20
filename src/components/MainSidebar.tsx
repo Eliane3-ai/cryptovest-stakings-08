@@ -1,12 +1,13 @@
 
 import React from 'react';
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Wallet, TrendingUp, BarChart3, Settings, ArrowRight } from "lucide-react";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslation } from '@/utils/translations';
 
 const MainSidebar: React.FC = () => {
   const { language } = useLanguage();
+  const location = useLocation();
   
   return (
     <div className="p-4">
@@ -18,19 +19,50 @@ const MainSidebar: React.FC = () => {
       </div>
       
       <nav className="space-y-1.5">
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary text-primary-foreground">
+        <Link 
+          to="/"
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg ${
+            location.pathname === '/' 
+              ? 'bg-primary text-primary-foreground' 
+              : 'text-muted-foreground hover:bg-muted transition-colors'
+          }`}
+        >
           <Wallet className="h-5 w-5" />
           <span className="font-medium">{getTranslation('wallet', language)}</span>
-        </button>
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
+        </Link>
+        
+        <Link 
+          to="/market"
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg ${
+            location.pathname === '/market' 
+              ? 'bg-primary text-primary-foreground' 
+              : 'text-muted-foreground hover:bg-muted transition-colors'
+          }`}
+        >
           <TrendingUp className="h-5 w-5" />
           <span className="font-medium">{getTranslation('market', language)}</span>
-        </button>
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
+        </Link>
+        
+        <Link 
+          to="/analytics"
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg ${
+            location.pathname === '/analytics' 
+              ? 'bg-primary text-primary-foreground' 
+              : 'text-muted-foreground hover:bg-muted transition-colors'
+          }`}
+        >
           <BarChart3 className="h-5 w-5" />
           <span className="font-medium">{getTranslation('analytics', language)}</span>
-        </button>
-        <Link to="/settings" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
+        </Link>
+        
+        <Link 
+          to="/settings" 
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg ${
+            location.pathname === '/settings' 
+              ? 'bg-primary text-primary-foreground' 
+              : 'text-muted-foreground hover:bg-muted transition-colors'
+          }`}
+        >
           <Settings className="h-5 w-5" />
           <span className="font-medium">{getTranslation('settings', language)}</span>
         </Link>
@@ -50,10 +82,10 @@ const MainSidebar: React.FC = () => {
            language === 'th' ? 'รับรางวัลโดยการสเตกสินทรัพย์คริปโตของคุณ' :
            'क्रिप्टो सम्पत्तिहरू स्टेक गरेर पुरस्कारहरू कमाउनुहोस्'}
         </p>
-        <button className="w-full flex items-center justify-center gap-2 bg-crypto-blue text-white py-2 px-3 rounded-lg text-sm font-medium transition-all hover:bg-opacity-90">
+        <Link to="/staking" className="w-full flex items-center justify-center gap-2 bg-crypto-blue text-white py-2 px-3 rounded-lg text-sm font-medium transition-all hover:bg-opacity-90">
           <span>{getTranslation('explore', language)}</span>
           <ArrowRight className="h-4 w-4" />
-        </button>
+        </Link>
       </div>
     </div>
   );

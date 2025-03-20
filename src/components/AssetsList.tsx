@@ -1,16 +1,7 @@
 
 import React from 'react';
 import TokenCard from "@/components/TokenCard";
-import { Bitcoin, Coins } from "lucide-react";
-
-interface Token {
-  name: string;
-  symbol: string;
-  balance: number;
-  usdValue: number;
-  iconColor: string;
-  icon: JSX.Element;
-}
+import { Token } from "@/data/initialTokens";
 
 interface AssetsListProps {
   tokens: Token[];
@@ -27,7 +18,7 @@ const AssetsList: React.FC<AssetsListProps> = ({ tokens }) => {
           balance={token.balance}
           usdValue={token.usdValue}
           iconColor={token.iconColor}
-          icon={token.icon}
+          iconComponent={token.iconComponent}
         />
       ))}
     </div>

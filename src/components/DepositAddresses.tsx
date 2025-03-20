@@ -1,87 +1,138 @@
 
 import React, { useState } from 'react';
-import { Copy, CheckCircle } from "lucide-react";
-import { toast } from "sonner";
+import { Bitcoin, Coins, Copy, Check } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslation } from '@/utils/translations';
+import { cn } from '@/lib/utils';
 
-// Fixed wallet addresses for all users
+// Fixed deposit addresses
 const FIXED_ADDRESSES = {
-  BTC: "19hjRhd7pYKdGvqDA9S6SPYbz6gfN5potm",
-  ETH: "0x3951714b1886442255858e42653d9552b5d5073a",
-  BNB: "0x3951714b1886442255858e42653d9552b5d5073a",
-  TRX: "TPy4csxqvQGvygSBFGqDUvJXfYGCcpdVxL",
-  USDT: "TPy4csxqvQGvygSBFGqDUvJXfYGCcpdVxL"
+  BTC: '19hjRhd7pYKdGvqDA9S6SPYbz6gfN5potm',
+  ETH_BNB: '0x3951714b1886442255858e42653d9552b5d5073a',
+  USDT_TRX: 'TPy4csxqvQGvygSBFGqDUvJXfYGCcpdVxL'
 };
 
-interface DepositAddressProps {
+interface DepositAddressesProps {
   className?: string;
 }
 
-const DepositAddresses: React.FC<DepositAddressProps> = ({ className }) => {
-  const [copiedCoin, setCopiedCoin] = useState<string | null>(null);
+const DepositAddresses: React.FC<DepositAddressesProps> = ({ className }) => {
   const { language } = useLanguage();
-
-  const handleCopyAddress = (coin: string, address: string) => {
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+  
+  const handleCopyAddress = (address: string) => {
     navigator.clipboard.writeText(address);
-    setCopiedCoin(coin);
+    setCopiedAddress(address);
     
-    const coinName = coin === 'BTC' ? 'Bitcoin' :
-                    coin === 'ETH' ? 'Ethereum' :
-                    coin === 'BNB' ? 'Binance Coin' :
-                    coin === 'TRX' ? 'Tron' : 'USDT';
-    
-    toast.success(getTranslation('addressCopied', language), {
-      description: `${coinName} ${getTranslation('addressCopiedDesc', language)}`,
-    });
-    
-    // Reset copied state after 3 seconds
+    // Reset copied state after 2 seconds
     setTimeout(() => {
-      setCopiedCoin(null);
-    }, 3000);
+      setCopiedAddress(null);
+    }, 2000);
   };
-
+  
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-xl border border-border p-5 ${className}`}>
-      <h2 className="font-medium mb-4">{getTranslation('depositAddresses', language)}</h2>
-      
-      <div className="space-y-4">
-        {Object.entries(FIXED_ADDRESSES).map(([coin, address]) => (
-          <div key={coin} className="p-3 border border-border rounded-lg">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="font-medium">{coin}</h3>
-              <button
-                onClick={() => handleCopyAddress(coin, address)}
-                className="text-sm text-crypto-blue hover:underline flex items-center"
+    <div className={cn("", className)}>
+      <Card>
+        <CardHeader>
+          <CardTitle>{getTranslation('depositAddresses', language)}</CardTitle>
+          <CardDescription>
+            {getTranslation('depositAddressesDesc', language)}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Bitcoin Address */}
+          <div className="p-4 rounded-lg border">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-amber-100">
+                <Bitcoin className="h-5 w-5 text-amber-600" />
+              </div>
+              <div>
+                <h3 className="font-medium">Bitcoin (BTC)</h3>
+                <p className="text-xs text-muted-foreground">Bitcoin Network</p>
+              </div>
+            </div>
+            <div className="mt-3 p-3 bg-muted rounded-lg flex items-center justify-between">
+              <code className="text-xs md:text-sm break-all">{FIXED_ADDRESSES.BTC}</code>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={() => handleCopyAddress(FIXED_ADDRESSES.BTC)}
+                className="ml-2 flex-shrink-0"
               >
-                {copiedCoin === coin ? (
-                  <>
-                    <CheckCircle className="h-3.5 w-3.5 mr-1 text-crypto-green" />
-                    <span>{getTranslation('copied', language)}</span>
-                  </>
+                {copiedAddress === FIXED_ADDRESSES.BTC ? (
+                  <Check className="h-4 w-4 text-green-500" />
                 ) : (
-                  <>
-                    <Copy className="h-3.5 w-3.5 mr-1" />
-                    <span>{getTranslation('copyAddress', language)}</span>
-                  </>
+                  <Copy className="h-4 w-4" />
                 )}
-              </button>
+              </Button>
             </div>
-            <div className="bg-muted/30 p-2 rounded text-xs font-mono break-all">
-              {address}
+          </div>
+          
+          {/* Ethereum & BNB Address */}
+          <div className="p-4 rounded-lg border">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-blue-100">
+                <Coins className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-medium">Ethereum (ETH) & Binance Coin (BNB)</h3>
+                <p className="text-xs text-muted-foreground">ERC-20 & BEP-20 Networks</p>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              {getTranslation('onlySend', language)} {coin} {getTranslation('toThisAddress', language)}
+            <div className="mt-3 p-3 bg-muted rounded-lg flex items-center justify-between">
+              <code className="text-xs md:text-sm break-all">{FIXED_ADDRESSES.ETH_BNB}</code>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={() => handleCopyAddress(FIXED_ADDRESSES.ETH_BNB)}
+                className="ml-2 flex-shrink-0"
+              >
+                {copiedAddress === FIXED_ADDRESSES.ETH_BNB ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+          
+          {/* USDT & TRX Address */}
+          <div className="p-4 rounded-lg border">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-red-100">
+                <Coins className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-medium">USDT & Tron (TRX)</h3>
+                <p className="text-xs text-muted-foreground">TRC-20 Network</p>
+              </div>
+            </div>
+            <div className="mt-3 p-3 bg-muted rounded-lg flex items-center justify-between">
+              <code className="text-xs md:text-sm break-all">{FIXED_ADDRESSES.USDT_TRX}</code>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={() => handleCopyAddress(FIXED_ADDRESSES.USDT_TRX)}
+                className="ml-2 flex-shrink-0"
+              >
+                {copiedAddress === FIXED_ADDRESSES.USDT_TRX ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+          
+          <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/30 rounded-lg mt-4">
+            <p className="text-sm text-amber-800 dark:text-amber-300">
+              <strong>{getTranslation('important', language)}:</strong> {getTranslation('depositWarning', language)}
             </p>
           </div>
-        ))}
-      </div>
-      
-      <div className="mt-5 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-900/30">
-        <p className="text-sm text-yellow-800 dark:text-yellow-400">
-          <span className="font-medium">{getTranslation('important', language)}:</span> {getTranslation('depositWarning', language)}
-        </p>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

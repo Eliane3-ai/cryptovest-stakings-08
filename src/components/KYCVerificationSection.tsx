@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { User, Globe, Phone, MapPin, CreditCard, Upload, Edit2, Loader2 } from 'lucide-react';
+import { User, Globe, Phone, MapPin, CreditCard, Upload, Edit2, Loader2, CheckCircle } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslation } from '@/utils/translations';
+import { useNavigate } from 'react-router-dom';
 
 const KYC_KEY = 'crypto_wallet_kyc_data';
 
@@ -19,11 +20,14 @@ interface KYCData {
   address: string;
   idCardFile?: string;
   isVerified: boolean;
+  isPending?: boolean;
+  submissionDate?: string;
 }
 
 const KYCVerificationSection: React.FC = () => {
   const { language } = useLanguage();
   const [kycDialogOpen, setKycDialogOpen] = useState(false);
+  const navigate = useNavigate();
   
   // Load KYC data from localStorage if it exists
   const [kycData, setKycData] = useState<KYCData>(() => {
@@ -35,13 +39,15 @@ const KYCVerificationSection: React.FC = () => {
       country: '',
       address: '',
       idCardFile: '',
-      isVerified: false
+      isVerified: false,
+      isPending: false
     };
   });
 
   const [kycFormData, setKycFormData] = useState<KYCData>(kycData);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
 
   const handleKYCSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,16 +67,20 @@ const KYCVerificationSection: React.FC = () => {
           clearInterval(interval);
           setTimeout(() => {
             // Save KYC data to localStorage
-            const updatedData = {...kycFormData, isVerified: true};
+            const currentDate = new Date().toISOString();
+            const updatedData = {
+              ...kycFormData, 
+              isPending: true, 
+              isVerified: false,
+              submissionDate: currentDate
+            };
+            
             localStorage.setItem(KYC_KEY, JSON.stringify(updatedData));
             setKycData(updatedData);
             
             setUploading(false);
             setKycDialogOpen(false);
-            
-            toast.success(getTranslation('kycComplete', language), {
-              description: getTranslation('kycCompleteDesc', language)
-            });
+            setSuccessDialogOpen(true);
             
             setUploadProgress(0);
           }, 500);
@@ -98,6 +108,12 @@ const KYCVerificationSection: React.FC = () => {
       [name]: value
     });
   };
+  
+  const handleSuccessDialogClose = () => {
+    setSuccessDialogOpen(false);
+    // Redirect to wallet page
+    navigate('/');
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl border border-border p-6 mb-6">
@@ -107,13 +123,30 @@ const KYCVerificationSection: React.FC = () => {
         <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-900/30 mb-6">
           <div className="flex items-center">
             <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center text-green-600 dark:text-green-400 mr-4">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+              <CheckCircle className="w-6 h-6" />
             </div>
             <div>
               <h3 className="font-medium text-green-800 dark:text-green-400">{getTranslation('verificationComplete', language)}</h3>
               <p className="text-sm text-green-700 dark:text-green-500 mt-1">{getTranslation('verificationCompleteDesc', language)}</p>
+            </div>
+          </div>
+        </div>
+      ) : kycData.isPending ? (
+        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-900/30 mb-6">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 mr-4">
+              <Loader2 className="w-6 h-6 animate-spin" />
+            </div>
+            <div>
+              <h3 className="font-medium text-blue-800 dark:text-blue-400">{getTranslation('verificationPending', language)}</h3>
+              <p className="text-sm text-blue-700 dark:text-blue-500 mt-1">
+                {getTranslation('verificationPendingDesc', language)}
+                {kycData.submissionDate && (
+                  <span className="block mt-1">
+                    {getTranslation('submittedOn', language)}: {new Date(kycData.submissionDate).toLocaleDateString()}
+                  </span>
+                )}
+              </p>
             </div>
           </div>
         </div>
@@ -191,22 +224,24 @@ const KYCVerificationSection: React.FC = () => {
           </div>
         </div>
         
-        <Button 
-          className="mt-4" 
-          onClick={() => setKycDialogOpen(true)}
-        >
-          {kycData.isVerified ? (
-            <>
-              <Edit2 className="h-4 w-4 mr-2" />
-              {getTranslation('updateKYC', language)}
-            </>
-          ) : (
-            <>
-              <Upload className="h-4 w-4 mr-2" />
-              {getTranslation('completeKYC', language)}
-            </>
-          )}
-        </Button>
+        {!kycData.isPending && (
+          <Button 
+            className="mt-4" 
+            onClick={() => setKycDialogOpen(true)}
+          >
+            {kycData.isVerified ? (
+              <>
+                <Edit2 className="h-4 w-4 mr-2" />
+                {getTranslation('updateKYC', language)}
+              </>
+            ) : (
+              <>
+                <Upload className="h-4 w-4 mr-2" />
+                {getTranslation('completeKYC', language)}
+              </>
+            )}
+          </Button>
+        )}
       </div>
 
       {/* KYC Dialog */}
@@ -325,6 +360,31 @@ const KYCVerificationSection: React.FC = () => {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Success Dialog */}
+      <Dialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{getTranslation('kycSubmitted', language)}</DialogTitle>
+            <DialogDescription>
+              {getTranslation('kycSubmittedDesc', language)}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-6 flex justify-center">
+            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400">
+              <CheckCircle className="w-8 h-8" />
+            </div>
+          </div>
+          <div className="text-center mb-4">
+            <p>{getTranslation('kycReviewProcess', language)}</p>
+          </div>
+          <div className="flex justify-center">
+            <Button onClick={handleSuccessDialogClose}>
+              {getTranslation('backToWallet', language)}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
