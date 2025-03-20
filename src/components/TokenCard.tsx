@@ -2,6 +2,7 @@
 import React from 'react';
 import { cn } from "@/lib/utils";
 import * as LucideIcons from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 
 interface TokenCardProps {
   name: string;
@@ -23,12 +24,22 @@ const TokenCard: React.FC<TokenCardProps> = ({
   className,
 }) => {
   // Get the icon component from Lucide icons
-  let IconComponent = LucideIcons.Coins; // Default fallback icon
-  
-  // Check if the icon name exists in LucideIcons and is a valid component
-  if (iconComponent in LucideIcons) {
-    IconComponent = LucideIcons[iconComponent as keyof typeof LucideIcons];
-  }
+  const IconComponent = React.useMemo(() => {
+    // Default fallback icon
+    const DefaultIcon = LucideIcons.Coins;
+    
+    // Check if the icon name exists in LucideIcons
+    if (iconComponent in LucideIcons) {
+      const SelectedIcon = LucideIcons[iconComponent as keyof typeof LucideIcons];
+      // Only return if it's a valid component (has the $$typeof property)
+      if (typeof SelectedIcon === 'function' || 
+          (typeof SelectedIcon === 'object' && SelectedIcon !== null && '$$typeof' in SelectedIcon)) {
+        return SelectedIcon as typeof DefaultIcon;
+      }
+    }
+    
+    return DefaultIcon;
+  }, [iconComponent]);
   
   return (
     <div className={cn(
