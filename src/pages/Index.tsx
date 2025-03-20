@@ -11,11 +11,14 @@ import {
   Settings 
 } from "lucide-react";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 import WalletHeader from "@/components/WalletHeader";
+import WalletActions from "@/components/WalletActions";
 import TokenCard from "@/components/TokenCard";
 import TransactionItem, { TransactionType } from "@/components/TransactionItem";
 import StakingCard from "@/components/StakingCard";
 import TabButton from "@/components/TabButton";
+import TradingViewWidget from "@/components/TradingViewWidget";
 
 // Token data
 const tokens = [
@@ -225,10 +228,10 @@ const Index: React.FC = () => {
                   <BarChart3 className="h-5 w-5" />
                   <span className="font-medium">Analytics</span>
                 </button>
-                <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
+                <Link to="/settings" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
                   <Settings className="h-5 w-5" />
                   <span className="font-medium">Settings</span>
-                </button>
+                </Link>
               </nav>
               
               <div className="mt-8 p-4 rounded-lg bg-crypto-blue bg-opacity-10">
@@ -244,8 +247,13 @@ const Index: React.FC = () => {
           
           {/* Main Content */}
           <div className="flex-1">
+            {/* Wallet Header */}
             <WalletHeader totalBalance={totalBalance} />
             
+            {/* Trading View Widget (slideshow) */}
+            <TradingViewWidget />
+            
+            {/* Tab Navigation */}
             <div className="mb-6 flex flex-wrap gap-2">
               <TabButton 
                 active={activeTab === 'assets'} 
@@ -265,8 +273,9 @@ const Index: React.FC = () => {
               />
             </div>
             
+            {/* Token Cards */}
             {activeTab === 'assets' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 fade-in">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 fade-in mb-6">
                 {tokens.map((token, index) => (
                   <TokenCard 
                     key={index}
@@ -281,6 +290,10 @@ const Index: React.FC = () => {
               </div>
             )}
             
+            {/* Wallet Action Buttons - NOW PLACED AFTER TOKENS */}
+            {activeTab === 'assets' && <WalletActions />}
+            
+            {/* Transactions Tab */}
             {activeTab === 'transactions' && (
               <div className="bg-white dark:bg-gray-800 rounded-xl border border-border soft-shadow overflow-hidden fade-in">
                 <div className="p-4 border-b border-border">
@@ -303,6 +316,7 @@ const Index: React.FC = () => {
               </div>
             )}
             
+            {/* Staking Tab */}
             {activeTab === 'staking' && (
               <div className="space-y-6 fade-in">
                 <h2 className="font-medium text-lg">Staking Options</h2>

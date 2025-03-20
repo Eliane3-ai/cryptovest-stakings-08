@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { cn } from "@/lib/utils";
-import { Wallet, ChevronDown } from "lucide-react";
+import { Wallet, ChevronDown, ArrowDownToLine, ArrowUpFromLine, Trophy, MessageCircle } from "lucide-react";
 
 interface WalletHeaderProps {
   totalBalance: number;
@@ -22,18 +22,6 @@ const WalletHeader: React.FC<WalletHeaderProps> = ({ totalBalance, className }) 
       <div className="mt-4">
         <p className="text-sm font-medium text-muted-foreground mb-1">Total Balance</p>
         <h1 className="text-4xl font-bold tracking-tight">${totalBalance.toLocaleString()}</h1>
-      </div>
-      
-      <div className="mt-6 flex gap-3">
-        <button className="flex-1 bg-crypto-blue text-white py-2.5 px-4 rounded-lg font-medium transition-all hover:bg-opacity-90 focus:ring-2 focus:ring-crypto-blue focus:ring-opacity-50">
-          Send
-        </button>
-        <button className="flex-1 bg-white dark:bg-gray-800 border border-border py-2.5 px-4 rounded-lg font-medium transition-all hover:bg-opacity-90 focus:ring-2 focus:ring-crypto-blue focus:ring-opacity-50">
-          Receive
-        </button>
-        <button className="flex-1 bg-white dark:bg-gray-800 border border-border py-2.5 px-4 rounded-lg font-medium transition-all hover:bg-opacity-90 focus:ring-2 focus:ring-crypto-blue focus:ring-opacity-50">
-          Swap
-        </button>
       </div>
     </div>
   );
