@@ -22,10 +22,13 @@ const TokenCard: React.FC<TokenCardProps> = ({
   iconComponent,
   className,
 }) => {
-  // Get the icon component from Lucide icons safely
-  const IconComponent = iconComponent in LucideIcons 
-    ? LucideIcons[iconComponent as keyof typeof LucideIcons] 
-    : LucideIcons.Coins; // Fallback to Coins icon if not found
+  // Get the icon component from Lucide icons
+  let IconComponent = LucideIcons.Coins; // Default fallback icon
+  
+  // Check if the icon name exists in LucideIcons and is a valid component
+  if (iconComponent in LucideIcons) {
+    IconComponent = LucideIcons[iconComponent as keyof typeof LucideIcons];
+  }
   
   return (
     <div className={cn(
@@ -35,7 +38,7 @@ const TokenCard: React.FC<TokenCardProps> = ({
       <div className="flex items-center gap-3">
         <div className={`p-2.5 rounded-lg flex items-center justify-center`} style={{ backgroundColor: `${iconColor}20` }}>
           <div className="text-xl" style={{ color: iconColor }}>
-            {IconComponent && <IconComponent />}
+            <IconComponent />
           </div>
         </div>
         <div className="flex-1">
