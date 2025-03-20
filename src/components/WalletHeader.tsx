@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { cn } from "@/lib/utils";
-import { Wallet, ChevronDown, ArrowDownToLine, ArrowUpFromLine, Trophy, MessageCircle, Repeat } from "lucide-react";
+import { Wallet, ChevronDown } from "lucide-react";
 import WalletActions from "@/components/WalletActions";
 
 interface WalletHeaderProps {
@@ -25,7 +25,7 @@ const WalletHeader: React.FC<WalletHeaderProps> = ({ totalBalance, className }) 
         <h1 className="text-4xl font-bold tracking-tight">${totalBalance.toLocaleString()}</h1>
       </div>
       
-      {/* Wallet Action Buttons moved below total balance display */}
+      {/* Wallet Action Buttons below total balance display */}
       <div className="mt-6">
         <WalletActions />
       </div>

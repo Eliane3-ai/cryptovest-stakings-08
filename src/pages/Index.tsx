@@ -8,7 +8,8 @@ import {
   History, 
   TrendingUp, 
   BarChart3, 
-  Settings 
+  Settings,
+  Menu
 } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
@@ -18,6 +19,7 @@ import TransactionItem, { TransactionType } from "@/components/TransactionItem";
 import StakingCard from "@/components/StakingCard";
 import TabButton from "@/components/TabButton";
 import TradingViewWidget from "@/components/TradingViewWidget";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 
 // Token data
 const tokens = [
@@ -203,148 +205,158 @@ const Index: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Sidebar */}
-          <div className="w-full md:w-64 mb-6 md:mb-0">
-            <div className="sticky top-8 glassmorphism p-4 rounded-xl soft-shadow">
-              <div className="flex items-center justify-center md:justify-start gap-3 mb-6">
-                <div className="bg-crypto-blue p-2 rounded-lg">
-                  <Wallet className="h-5 w-5 text-white" />
+        {/* Top App Bar with Menu */}
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Drawer>
+              <DrawerTrigger asChild>
+                <button className="p-2 rounded-lg hover:bg-muted">
+                  <Menu className="h-6 w-6" />
+                </button>
+              </DrawerTrigger>
+              <DrawerContent className="h-[85vh]">
+                <div className="p-4">
+                  <div className="flex items-center justify-center md:justify-start gap-3 mb-6">
+                    <div className="bg-crypto-blue p-2 rounded-lg">
+                      <Wallet className="h-5 w-5 text-white" />
+                    </div>
+                    <h2 className="text-xl font-bold">CryptoWallet</h2>
+                  </div>
+                  
+                  <nav className="space-y-1.5">
+                    <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary text-primary-foreground">
+                      <Wallet className="h-5 w-5" />
+                      <span className="font-medium">Wallet</span>
+                    </button>
+                    <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
+                      <TrendingUp className="h-5 w-5" />
+                      <span className="font-medium">Market</span>
+                    </button>
+                    <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
+                      <BarChart3 className="h-5 w-5" />
+                      <span className="font-medium">Analytics</span>
+                    </button>
+                    <Link to="/settings" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
+                      <Settings className="h-5 w-5" />
+                      <span className="font-medium">Settings</span>
+                    </Link>
+                  </nav>
+                  
+                  <div className="mt-8 p-4 rounded-lg bg-crypto-blue bg-opacity-10">
+                    <h3 className="font-medium mb-2">Start Earning</h3>
+                    <p className="text-sm text-muted-foreground mb-3">Earn rewards by staking your crypto assets</p>
+                    <button className="w-full flex items-center justify-center gap-2 bg-crypto-blue text-white py-2 px-3 rounded-lg text-sm font-medium transition-all hover:bg-opacity-90">
+                      <span>Explore</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
-                <h2 className="text-xl font-bold">CryptoWallet</h2>
-              </div>
-              
-              <nav className="space-y-1.5">
-                <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary text-primary-foreground">
-                  <Wallet className="h-5 w-5" />
-                  <span className="font-medium">Wallet</span>
-                </button>
-                <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
-                  <TrendingUp className="h-5 w-5" />
-                  <span className="font-medium">Market</span>
-                </button>
-                <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
-                  <BarChart3 className="h-5 w-5" />
-                  <span className="font-medium">Analytics</span>
-                </button>
-                <Link to="/settings" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted transition-colors">
-                  <Settings className="h-5 w-5" />
-                  <span className="font-medium">Settings</span>
-                </Link>
-              </nav>
-              
-              <div className="mt-8 p-4 rounded-lg bg-crypto-blue bg-opacity-10">
-                <h3 className="font-medium mb-2">Start Earning</h3>
-                <p className="text-sm text-muted-foreground mb-3">Earn rewards by staking your crypto assets</p>
-                <button className="w-full flex items-center justify-center gap-2 bg-crypto-blue text-white py-2 px-3 rounded-lg text-sm font-medium transition-all hover:bg-opacity-90">
-                  <span>Explore</span>
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+              </DrawerContent>
+            </Drawer>
+            <h1 className="text-xl font-bold">CryptoWallet</h1>
+          </div>
+        </div>
+          
+        {/* Main Content */}
+        <div>
+          {/* Wallet Header with actions integrated */}
+          <WalletHeader totalBalance={totalBalance} />
+          
+          {/* Trading View Widget (slideshow) */}
+          <TradingViewWidget />
+          
+          {/* Tab Navigation */}
+          <div className="mb-6 flex flex-wrap gap-2">
+            <TabButton 
+              active={activeTab === 'assets'} 
+              label="Assets" 
+              onClick={() => setActiveTab('assets')}
+            />
+            <TabButton 
+              active={activeTab === 'transactions'} 
+              label="Transactions"
+              icon={<History className="h-4 w-4" />} 
+              onClick={() => setActiveTab('transactions')}
+            />
+            <TabButton 
+              active={activeTab === 'staking'} 
+              label="Staking" 
+              onClick={() => setActiveTab('staking')}
+            />
           </div>
           
-          {/* Main Content */}
-          <div className="flex-1">
-            {/* Wallet Header with actions integrated */}
-            <WalletHeader totalBalance={totalBalance} />
-            
-            {/* Trading View Widget (slideshow) */}
-            <TradingViewWidget />
-            
-            {/* Tab Navigation */}
-            <div className="mb-6 flex flex-wrap gap-2">
-              <TabButton 
-                active={activeTab === 'assets'} 
-                label="Assets" 
-                onClick={() => setActiveTab('assets')}
-              />
-              <TabButton 
-                active={activeTab === 'transactions'} 
-                label="Transactions"
-                icon={<History className="h-4 w-4" />} 
-                onClick={() => setActiveTab('transactions')}
-              />
-              <TabButton 
-                active={activeTab === 'staking'} 
-                label="Staking" 
-                onClick={() => setActiveTab('staking')}
-              />
+          {/* Token Cards */}
+          {activeTab === 'assets' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 fade-in mb-6">
+              {tokens.map((token, index) => (
+                <TokenCard 
+                  key={index}
+                  name={token.name}
+                  symbol={token.symbol}
+                  balance={token.balance}
+                  usdValue={token.usdValue}
+                  iconColor={token.iconColor}
+                  icon={token.icon}
+                />
+              ))}
             </div>
-            
-            {/* Token Cards */}
-            {activeTab === 'assets' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 fade-in mb-6">
-                {tokens.map((token, index) => (
-                  <TokenCard 
+          )}
+          
+          {/* Transactions Tab */}
+          {activeTab === 'transactions' && (
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-border soft-shadow overflow-hidden fade-in">
+              <div className="p-4 border-b border-border">
+                <h2 className="font-medium">Recent Transactions</h2>
+              </div>
+              
+              <div className="max-h-[600px] overflow-y-auto">
+                {transactions.map((transaction, index) => (
+                  <TransactionItem 
                     key={index}
-                    name={token.name}
-                    symbol={token.symbol}
-                    balance={token.balance}
-                    usdValue={token.usdValue}
-                    iconColor={token.iconColor}
-                    icon={token.icon}
+                    type={transaction.type}
+                    amount={transaction.amount}
+                    token={transaction.token}
+                    date={transaction.date}
+                    address={transaction.address}
+                    usdValue={transaction.usdValue}
                   />
                 ))}
               </div>
-            )}
-            
-            {/* Transactions Tab */}
-            {activeTab === 'transactions' && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl border border-border soft-shadow overflow-hidden fade-in">
-                <div className="p-4 border-b border-border">
-                  <h2 className="font-medium">Recent Transactions</h2>
-                </div>
-                
-                <div className="max-h-[600px] overflow-y-auto">
-                  {transactions.map((transaction, index) => (
-                    <TransactionItem 
-                      key={index}
-                      type={transaction.type}
-                      amount={transaction.amount}
-                      token={transaction.token}
-                      date={transaction.date}
-                      address={transaction.address}
-                      usdValue={transaction.usdValue}
-                    />
-                  ))}
-                </div>
+            </div>
+          )}
+          
+          {/* Staking Tab */}
+          {activeTab === 'staking' && (
+            <div className="space-y-6 fade-in">
+              <h2 className="font-medium text-lg">Staking Options</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {stakingOptions.map((option, index) => (
+                  <StakingCard 
+                    key={index}
+                    token={option.token}
+                    symbol={option.symbol}
+                    stakedAmount={option.stakedAmount}
+                    apy={option.apy}
+                    rewards={option.rewards}
+                    rewardToken={option.rewardToken}
+                  />
+                ))}
               </div>
-            )}
-            
-            {/* Staking Tab */}
-            {activeTab === 'staking' && (
-              <div className="space-y-6 fade-in">
-                <h2 className="font-medium text-lg">Staking Options</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {stakingOptions.map((option, index) => (
-                    <StakingCard 
-                      key={index}
-                      token={option.token}
-                      symbol={option.symbol}
-                      stakedAmount={option.stakedAmount}
-                      apy={option.apy}
-                      rewards={option.rewards}
-                      rewardToken={option.rewardToken}
-                    />
-                  ))}
-                </div>
-                
-                <div className="p-5 rounded-xl border border-border bg-white dark:bg-gray-800">
-                  <h3 className="font-medium mb-3">Learn About Staking</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Staking is a way to earn rewards by holding certain cryptocurrencies. 
-                    When you stake your digital assets, you help support the security and 
-                    operations of a blockchain network and earn rewards in return.
-                  </p>
-                  <button className="text-crypto-blue text-sm font-medium hover:underline flex items-center">
-                    <span>Learn more</span>
-                    <ArrowRight className="h-4 w-4 ml-1" />
-                  </button>
-                </div>
+              
+              <div className="p-5 rounded-xl border border-border bg-white dark:bg-gray-800">
+                <h3 className="font-medium mb-3">Learn About Staking</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Staking is a way to earn rewards by holding certain cryptocurrencies. 
+                  When you stake your digital assets, you help support the security and 
+                  operations of a blockchain network and earn rewards in return.
+                </p>
+                <button className="text-crypto-blue text-sm font-medium hover:underline flex items-center">
+                  <span>Learn more</span>
+                  <ArrowRight className="h-4 w-4 ml-1" />
+                </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
