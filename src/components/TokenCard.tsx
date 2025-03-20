@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { cn } from "@/lib/utils";
+import * as LucideIcons from 'lucide-react';
 
 interface TokenCardProps {
   name: string;
@@ -8,7 +9,7 @@ interface TokenCardProps {
   balance: number;
   usdValue: number;
   iconColor: string;
-  icon: React.ReactNode;
+  iconComponent: string; // Changed from icon: React.ReactNode to iconComponent: string
   className?: string;
 }
 
@@ -18,9 +19,12 @@ const TokenCard: React.FC<TokenCardProps> = ({
   balance,
   usdValue,
   iconColor,
-  icon,
+  iconComponent,
   className,
 }) => {
+  // Dynamically render the icon based on the iconComponent string
+  const IconComponent = LucideIcons[iconComponent as keyof typeof LucideIcons];
+  
   return (
     <div className={cn(
       "p-4 rounded-xl border border-border bg-white dark:bg-gray-800 token-card soft-shadow",
@@ -29,7 +33,7 @@ const TokenCard: React.FC<TokenCardProps> = ({
       <div className="flex items-center gap-3">
         <div className={`p-2.5 rounded-lg flex items-center justify-center`} style={{ backgroundColor: `${iconColor}20` }}>
           <div className="text-xl" style={{ color: iconColor }}>
-            {icon}
+            {IconComponent && <IconComponent />}
           </div>
         </div>
         <div className="flex-1">

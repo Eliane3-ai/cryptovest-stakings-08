@@ -8,7 +8,7 @@ export interface Token {
   balance: number;
   usdValue: number;
   iconColor: string;
-  icon: JSX.Element;
+  iconComponent: string; // Changed from icon: JSX.Element to iconComponent: string
 }
 
 // Initial tokens data
@@ -19,7 +19,7 @@ export const initialTokens: Token[] = [
     balance: 0.375,
     usdValue: 16500,
     iconColor: "#F7931A",
-    icon: <Bitcoin />,
+    iconComponent: "Bitcoin",
   },
   {
     name: "Ethereum",
@@ -27,7 +27,7 @@ export const initialTokens: Token[] = [
     balance: 7.23,
     usdValue: 27900,
     iconColor: "#627EEA",
-    icon: <Coins />,
+    iconComponent: "Coins",
   },
   {
     name: "Binance Coin",
@@ -35,7 +35,7 @@ export const initialTokens: Token[] = [
     balance: 36.5,
     usdValue: 13690,
     iconColor: "#F0B90B",
-    icon: <Coins />,
+    iconComponent: "Coins",
   },
   {
     name: "Tron",
@@ -43,7 +43,7 @@ export const initialTokens: Token[] = [
     balance: 45000,
     usdValue: 14600,
     iconColor: "#FF060A",
-    icon: <Coins />,
+    iconComponent: "Coins",
   },
   {
     name: "Cardano",
@@ -51,7 +51,7 @@ export const initialTokens: Token[] = [
     balance: 10500,
     usdValue: 8750,
     iconColor: "#0033AD",
-    icon: <Coins />,
+    iconComponent: "Coins",
   },
   {
     name: "Solana",
@@ -59,7 +59,7 @@ export const initialTokens: Token[] = [
     balance: 180,
     usdValue: 7760,
     iconColor: "#9945FF",
-    icon: <Coins />,
+    iconComponent: "Coins",
   },
   {
     name: "Polkadot",
@@ -67,7 +67,7 @@ export const initialTokens: Token[] = [
     balance: 1200,
     usdValue: 6540,
     iconColor: "#E6007A",
-    icon: <Coins />,
+    iconComponent: "Coins",
   },
   {
     name: "Dogecoin",
@@ -75,6 +75,6 @@ export const initialTokens: Token[] = [
     balance: 15000,
     usdValue: 4820,
     iconColor: "#C2A633",
-    icon: <Coins />,
+    iconComponent: "Coins",
   },
 ];
