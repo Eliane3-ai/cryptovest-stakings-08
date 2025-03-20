@@ -5,33 +5,33 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 240 10% 3.9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 240 10% 3.9%;
 
-    --primary: 222 47% 11%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
 
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 222 84% 5%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
 
     --radius: 0.75rem;
 
@@ -45,34 +45,34 @@
     --sidebar-ring: 217 91% 60%;
   }
 
-  .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
+  .dark, [data-theme="dark"] {
+    --background: 225 9% 9%;
+    --foreground: 0 0% 98%;
 
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
+    --card: 228 9% 12%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 228 9% 12%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222 47% 11%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
 
-    --secondary: 217 33% 18%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 228 7% 14%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 217 33% 18%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 228 7% 14%;
+    --muted-foreground: 240 5% 64.9%;
 
-    --accent: 217 33% 18%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 228 7% 14%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 217 33% 18%;
-    --input: 217 33% 18%;
-    --ring: 213 27% 84%;
+    --border: 228 12% 18%;
+    --input: 228 12% 18%;
+    --ring: 228 12% 18%;
     
     --sidebar-background: 240 6% 10%;
     --sidebar-foreground: 240 5% 96%;
@@ -111,18 +111,154 @@
   }
 }
 
+/* Binance theme variables */
+:root {
+  --binance-yellow: #F0B90B;
+  --binance-black: #0B0E11;
+  --binance-dark-bg: #1E2026;
+  --binance-card-bg: #2B3139;
+  --binance-border: #474D57;
+  --binance-text-primary: #FFFFFF;
+  --binance-text-secondary: #848E9C;
+  --binance-green: #0ECB81;
+  --binance-red: #F6465D;
+  --binance-light-border: #E6E8EA;
+  --binance-light-bg: #F8FAFD;
+  --binance-light-text: #707A8A;
+}
+
+/* Binance styled container for balance */
+.balance-container {
+  background-color: rgba(240, 185, 11, 0.1);
+  border: 1px solid rgba(240, 185, 11, 0.3);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+/* Binance-like button styles */
+.binance-button {
+  background-color: var(--binance-yellow);
+  color: var(--binance-black);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.binance-button:hover {
+  background-color: rgba(240, 185, 11, 0.9);
+}
+
+.binance-button-outline {
+  background-color: transparent;
+  border: 1px solid var(--binance-yellow);
+  color: var(--binance-yellow);
+}
+
+.binance-button-outline:hover {
+  background-color: rgba(240, 185, 11, 0.1);
+}
+
+/* Cryptocurrency card flash */
+@keyframes price-flash-up {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(14, 203, 129, 0.1); }
+}
+
+@keyframes price-flash-down {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(246, 70, 93, 0.1); }
+}
+
+.price-up {
+  animation: price-flash-up 0.5s ease-in-out;
+}
+
+.price-down {
+  animation: price-flash-down 0.5s ease-in-out;
+}
+
+/* Chat styles */
+.chat-message-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.chat-message-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.chat-bubble {
+  position: relative;
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  max-width: 80%;
+}
+
+.chat-bubble:after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.chat-message-withdrawal {
+  background-color: rgba(14, 203, 129, 0.1);
+  border: 1px solid rgba(14, 203, 129, 0.2);
+}
+
+.chat-message-deposit {
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.chat-message-price {
+  background-color: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.chat-message-news {
+  background-color: rgba(249, 115, 22, 0.1);
+  border: 1px solid rgba(249, 115, 22, 0.2);
+}
+
+.chat-user-avatar {
+  border: 2px solid #F0B90B;
+  box-shadow: 0 0 0 2px rgba(240, 185, 11, 0.1);
+}
+
+/* Chat animations */
+@keyframes chat-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(240, 185, 11, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(240, 185, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(240, 185, 11, 0); }
+}
+
+.chat-pulse {
+  animation: chat-pulse 2s infinite;
+}
+
+/* Binance-styled glassmorphism */
 .glassmorphism {
-  @apply bg-white/70 dark:bg-black/70 backdrop-blur-lg border border-white/20 dark:border-black/20 rounded-lg;
+  @apply bg-[#1E2026]/70 backdrop-blur-lg border border-[#474D57]/20 rounded-lg;
 }
 
 .soft-shadow {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 
 .shimmer-effect {
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(90deg, rgba(71, 77, 87, 0) 0%, rgba(71, 77, 87, 0.4) 50%, rgba(71, 77, 87, 0) 100%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
 }
 
 @keyframes fadeIn {
@@ -136,15 +272,17 @@
 
 .token-card {
   transition: all 0.3s ease;
+  @apply bg-[#2B3139] border-[#474D57];
 }
 
 .token-card:hover {
   transform: translateY(-5px);
+  @apply border-[#F0B90B]/30;
 }
 
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 5px rgba(134, 140, 255, 0.5); }
-  50% { box-shadow: 0 0 20px rgba(134, 140, 255, 0.8); }
+  0%, 100% { box-shadow: 0 0 5px rgba(240, 185, 11, 0.3); }
+  50% { box-shadow: 0 0 15px rgba(240, 185, 11, 0.6); }
 }
 
 .glow-effect {

@@ -15,6 +15,8 @@ import WalletConnect from "./pages/WalletConnect";
 import Exchange from "./pages/Exchange";
 import Deposit from "./pages/Deposit";
 import NotFound from "./pages/NotFound";
+import Chat from "./pages/Chat";
+import Winners from "./pages/Winners";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +37,8 @@ const App = () => (
                 <Route path="/wallet-connect" element={<WalletConnect />} />
                 <Route path="/exchange" element={<Exchange />} />
                 <Route path="/deposit" element={<Deposit />} />
+                <Route path="/chat" element={<Chat />} />
+                <Route path="/winners" element={<Winners />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

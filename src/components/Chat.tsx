@@ -9,6 +9,7 @@ import ChatMessages from '@/components/ChatMessages';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { format } from 'date-fns';
 
 interface ChatProps {
   className?: string;
@@ -98,9 +99,14 @@ const Chat: React.FC<ChatProps> = ({ className = '' }) => {
     setIsExpanded(!isExpanded);
   };
 
-  const handleOpenChat = () => {
-    setChatOpen(true);
-    resetNotification();
+  const formatTimeAgo = (date: Date) => {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) return 'just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    return format(date, 'MMM dd');
   };
 
   return (
@@ -168,7 +174,7 @@ const Chat: React.FC<ChatProps> = ({ className = '' }) => {
                               {message.message}
                             </div>
                             <div className="text-xs text-gray-500 mt-1">
-                              {formatDistanceToNow(message.timestamp, { addSuffix: true })}
+                              {formatTimeAgo(message.timestamp)}
                             </div>
                           </div>
                         );
