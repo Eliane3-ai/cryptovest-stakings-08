@@ -1,75 +1,274 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MessageCircle, Send, Users } from 'lucide-react';
+import { MessageCircle, Send, Users, Image, X, BellDot } from 'lucide-react';
 import { useChatContext } from '@/contexts/ChatContext';
 import ChatMessages from '@/components/ChatMessages';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface ChatProps {
   className?: string;
 }
 
 const Chat: React.FC<ChatProps> = ({ className = '' }) => {
-  const { messages, sendMessage } = useChatContext();
+  const { 
+    messages, 
+    sendMessage, 
+    sendPrivateMessage, 
+    adminBot, 
+    chatOpen, 
+    setChatOpen,
+    notification,
+    resetNotification
+  } = useChatContext();
+  
   const [inputValue, setInputValue] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [showPrivateChat, setShowPrivateChat] = useState(false);
+  const [privateMessage, setPrivateMessage] = useState('');
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputValue.trim() === '') return;
+    if (inputValue.trim() === '' && !selectedImage && !selectedVideo) return;
     
-    sendMessage(inputValue);
+    let media = undefined;
+    
+    if (selectedImage) {
+      media = { type: 'image' as const, url: selectedImage };
+    } else if (selectedVideo) {
+      media = { type: 'video' as const, url: selectedVideo };
+    }
+    
+    sendMessage(inputValue, media);
     setInputValue('');
+    setSelectedImage(null);
+    setSelectedVideo(null);
+  };
+
+  const handleSendPrivateMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (privateMessage.trim() === '') return;
+    
+    sendPrivateMessage(privateMessage, adminBot.id);
+    setPrivateMessage('');
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Create a URL for the file
+    const fileUrl = URL.createObjectURL(file);
+    
+    // Check if it's an image or video
+    if (file.type.startsWith('image/')) {
+      setSelectedImage(fileUrl);
+      setSelectedVideo(null);
+    } else if (file.type.startsWith('video/')) {
+      setSelectedVideo(fileUrl);
+      setSelectedImage(null);
+    }
+    
+    // Reset the input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const clearSelectedMedia = () => {
+    if (selectedImage) {
+      URL.revokeObjectURL(selectedImage);
+      setSelectedImage(null);
+    }
+    if (selectedVideo) {
+      URL.revokeObjectURL(selectedVideo);
+      setSelectedVideo(null);
+    }
   };
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
 
+  const handleOpenChat = () => {
+    setChatOpen(true);
+    resetNotification();
+  };
+
   return (
-    <Card className={`shadow-xl transition-all duration-300 ${className} ${isExpanded ? 'h-[550px]' : 'h-[400px]'}`}>
-      <CardHeader className="px-4 py-3 flex flex-row items-center justify-between space-y-0">
-        <div className="flex items-center gap-2">
-          <MessageCircle className="h-5 w-5 text-[#F0B90B]" />
-          <CardTitle className="text-lg font-medium">Live Chat</CardTitle>
-          <Badge variant="outline" className="bg-[#F0B90B1A] border-[#F0B90B33] text-[#F0B90B]">
-            <Users className="h-3 w-3 mr-1" />
-            {messages.length > 0 ? `${Math.min(500, messages.length)} online` : 'Connecting...'}
+    <>
+      {/* Floating notification badge */}
+      {notification.count > 0 && !chatOpen && (
+        <div className="fixed top-4 right-4 z-50 animate-bounce">
+          <Badge variant="outline" className="bg-[#F0B90B] text-black px-3 py-2 flex items-center gap-1">
+            <BellDot className="h-4 w-4" />
+            {notification.count} new messages
           </Badge>
         </div>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={toggleExpand}
-          className="text-xs"
-        >
-          {isExpanded ? 'Minimize' : 'Expand'}
-        </Button>
-      </CardHeader>
-      <CardContent className="p-0">
-        <ChatMessages 
-          maxHeight={isExpanded ? '420px' : '280px'} 
-          className="rounded-none"
-        />
-      </CardContent>
-      <CardFooter className="p-3 border-t">
-        <form onSubmit={handleSendMessage} className="flex w-full gap-2">
-          <Input
-            placeholder="Type your message..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            className="flex-1"
-          />
-          <Button type="submit" size="sm" className="bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black">
-            <Send className="h-4 w-4" />
-            <span className="sr-only">Send</span>
-          </Button>
-        </form>
-      </CardFooter>
-    </Card>
+      )}
+      
+      {chatOpen && (
+        <Card className={`shadow-xl transition-all duration-300 ${className} ${isExpanded ? 'h-[550px]' : 'h-[400px]'}`}>
+          <CardHeader className="px-4 py-3 flex flex-row items-center justify-between space-y-0">
+            <div className="flex items-center gap-2">
+              <MessageCircle className="h-5 w-5 text-[#F0B90B]" />
+              <CardTitle className="text-lg font-medium">Live Chat</CardTitle>
+              <Badge variant="outline" className="bg-[#F0B90B1A] border-[#F0B90B33] text-[#F0B90B]">
+                <Users className="h-3 w-3 mr-1" />
+                {messages.length > 0 ? `${Math.min(500, messages.length)} online` : 'Connecting...'}
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <Dialog open={showPrivateChat} onOpenChange={setShowPrivateChat}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="text-xs">
+                    <Avatar className="h-5 w-5 mr-1 border border-[#F0B90B]">
+                      <AvatarImage src={adminBot.avatar} alt={adminBot.name} />
+                      <AvatarFallback>RT</AvatarFallback>
+                    </Avatar>
+                    Message Admin
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Avatar className="h-6 w-6 border border-[#F0B90B]">
+                        <AvatarImage src={adminBot.avatar} alt={adminBot.name} />
+                        <AvatarFallback>RT</AvatarFallback>
+                      </Avatar>
+                      Private chat with {adminBot.name}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-4 border rounded-md p-4 h-[300px] overflow-y-auto">
+                    {messages
+                      .filter(m => m.isPrivate && (
+                        (m.userId === 'current-user' && m.recipientId === adminBot.id) || 
+                        (m.userId === adminBot.id && m.recipientId === 'current-user')
+                      ))
+                      .map(message => {
+                        const isFromAdmin = message.userId === adminBot.id;
+                        return (
+                          <div 
+                            key={message.id} 
+                            className={`mb-3 ${isFromAdmin ? 'text-left' : 'text-right'}`}
+                          >
+                            <div className={`inline-block p-2 rounded-lg ${
+                              isFromAdmin 
+                                ? 'bg-gray-100 dark:bg-gray-800' 
+                                : 'bg-[#F0B90B] text-black'
+                            }`}>
+                              {message.message}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              {formatDistanceToNow(message.timestamp, { addSuffix: true })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                  <form onSubmit={handleSendPrivateMessage} className="mt-4 flex gap-2">
+                    <Input
+                      value={privateMessage}
+                      onChange={(e) => setPrivateMessage(e.target.value)}
+                      placeholder="Type a private message..."
+                      className="flex-1"
+                    />
+                    <Button type="submit" className="bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black">
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={toggleExpand}
+                className="text-xs"
+              >
+                {isExpanded ? 'Minimize' : 'Expand'}
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setChatOpen(false)}
+                className="text-xs"
+              >
+                Close
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <ChatMessages 
+              maxHeight={isExpanded ? '420px' : '280px'} 
+              className="rounded-none"
+            />
+          </CardContent>
+          <CardFooter className="p-3 border-t flex-col items-stretch">
+            {(selectedImage || selectedVideo) && (
+              <div className="relative mb-2 border rounded p-2">
+                <button 
+                  onClick={clearSelectedMedia}
+                  className="absolute top-1 right-1 z-10 bg-red-500 text-white rounded-full p-0.5"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+                {selectedImage && (
+                  <img 
+                    src={selectedImage} 
+                    alt="Selected" 
+                    className="max-h-[100px] max-w-full object-contain mx-auto"
+                  />
+                )}
+                {selectedVideo && (
+                  <video 
+                    src={selectedVideo} 
+                    className="max-h-[100px] max-w-full object-contain mx-auto"
+                    controls
+                  />
+                )}
+              </div>
+            )}
+            <form onSubmit={handleSendMessage} className="flex w-full gap-2">
+              <Input
+                placeholder="Type your message..."
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                className="flex-1"
+              />
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                accept="image/*,video/*"
+                className="hidden"
+              />
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm" 
+                onClick={() => fileInputRef.current?.click()}
+                className="text-[#F0B90B]"
+              >
+                <Image className="h-4 w-4" />
+                <span className="sr-only">Attach media</span>
+              </Button>
+              <Button type="submit" size="sm" className="bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black">
+                <Send className="h-4 w-4" />
+                <span className="sr-only">Send</span>
+              </Button>
+            </form>
+          </CardFooter>
+        </Card>
+      )}
+    </>
   );
 };
 

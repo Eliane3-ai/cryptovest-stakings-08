@@ -8,7 +8,9 @@ import TransactionsList from "@/components/TransactionsList";
 import StakingSection from "@/components/StakingSection";
 import LiveMarketView from "@/components/LiveMarketView";
 import Chat from "@/components/Chat";
+import WalletActions from "@/components/WalletActions";
 import { useWalletData } from "@/hooks/useWalletData";
+import { useChatContext } from "@/contexts/ChatContext";
 
 const Index: React.FC = () => {
   const { 
@@ -19,6 +21,8 @@ const Index: React.FC = () => {
     totalBalance,
     stakingOptions 
   } = useWalletData();
+  
+  const { chatOpen } = useChatContext();
 
   return (
     <div className="min-h-screen bg-background">
@@ -31,13 +35,20 @@ const Index: React.FC = () => {
           {/* Wallet Header with actions integrated */}
           <WalletHeader totalBalance={totalBalance} />
           
+          {/* Action Buttons (with chat integration) */}
+          <div className="mb-6">
+            <WalletActions />
+          </div>
+          
           {/* Live Market View */}
           <LiveMarketView />
           
-          {/* Live Chat */}
-          <div className="mb-6">
-            <Chat />
-          </div>
+          {/* Chat is now controlled by the Chat button, no need to always show it */}
+          {chatOpen && (
+            <div className="mb-6">
+              <Chat />
+            </div>
+          )}
           
           {/* Tab Navigation */}
           <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} />

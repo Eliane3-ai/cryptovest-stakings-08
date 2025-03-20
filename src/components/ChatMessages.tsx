@@ -5,6 +5,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import { MessageCircle, Lock } from 'lucide-react';
 
 interface ChatMessagesProps {
   maxHeight?: string;
@@ -12,15 +13,27 @@ interface ChatMessagesProps {
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({ maxHeight = '400px', className = '' }) => {
-  const { messages, users, isLoading } = useChatContext();
+  const { messages, users, isLoading, adminBot } = useChatContext();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  // Current user ID (in a real app, this would come from authentication)
+  const currentUserId = 'current-user';
 
   // Get user data by ID
   const getUserById = (userId: string) => {
+    if (userId === 'current-user') {
+      return {
+        name: 'You',
+        avatar: '',
+        country: 'Your Location',
+        isAdmin: false
+      };
+    }
     return users.find(user => user.id === userId) || {
       name: 'Unknown User',
       avatar: '',
-      country: 'Unknown'
+      country: 'Unknown',
+      isAdmin: false
     };
   };
 
@@ -55,6 +68,18 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ maxHeight = '400px', classN
     }
   };
 
+  // Filter messages to show only those that are relevant to the current user
+  const filteredMessages = messages.filter(message => {
+    // Show all public messages
+    if (!message.isPrivate) return true;
+    
+    // Show private messages only if the current user is involved
+    return (
+      (message.userId === currentUserId && message.recipientId === adminBot.id) ||
+      (message.userId === adminBot.id && message.recipientId === currentUserId)
+    );
+  });
+
   // Skeleton loading for chat messages
   if (isLoading) {
     return (
@@ -78,25 +103,76 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ maxHeight = '400px', classN
       className={`w-full ${className}`} 
       style={{ height: maxHeight }}>
       <div className="flex flex-col gap-3 p-3">
-        {messages.map((message) => {
+        {filteredMessages.map((message) => {
           const user = getUserById(message.userId);
+          const isPrivate = message.isPrivate;
+          const isCurrentUser = message.userId === currentUserId;
+          
           return (
-            <div key={message.id} className="flex items-start gap-3 animate-in fade-in slide-in-from-bottom-5 duration-300">
-              <Avatar>
+            <div 
+              key={message.id} 
+              className={`flex items-start gap-3 animate-in fade-in slide-in-from-bottom-5 duration-300 ${
+                isPrivate ? 'pl-2 border-l-2 border-[#F0B90B]' : ''
+              }`}
+            >
+              <Avatar className={user.isAdmin ? 'ring-2 ring-[#F0B90B]' : ''}>
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback>{user.name.substring(0, 2)}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-sm">{user.name}</span>
+                  <span className={`font-medium text-sm ${user.isAdmin ? 'text-[#F0B90B]' : ''}`}>
+                    {user.name}
+                    {user.isAdmin && ' (Admin)'}
+                  </span>
                   <span className="text-xs text-gray-500 dark:text-gray-400">{user.country}</span>
+                  {isPrivate && (
+                    <span className="text-xs bg-[#F0B90B]/10 text-[#F0B90B] px-1.5 py-0.5 rounded-full flex items-center">
+                      <Lock className="h-3 w-3 mr-1" />
+                      Private
+                    </span>
+                  )}
                   <span className="text-xs text-gray-400 dark:text-gray-500 ml-auto">
                     {formatMessageTime(message.timestamp)}
                   </span>
                 </div>
                 <div className={`mt-1 p-3 rounded-lg border ${getMessageTypeClass(message.type)}`}>
                   {message.message}
+                  
+                  {/* Media content */}
+                  {message.media && (
+                    <div className="mt-2 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                      {message.media.type === 'image' && (
+                        <img 
+                          src={message.media.url} 
+                          alt="Shared image" 
+                          className="max-w-full h-auto max-h-[300px] object-contain"
+                        />
+                      )}
+                      {message.media.type === 'video' && (
+                        <video 
+                          src={message.media.url} 
+                          controls 
+                          className="max-w-full h-auto max-h-[300px]"
+                        />
+                      )}
+                    </div>
+                  )}
                 </div>
+                
+                {/* Private message option for admin */}
+                {user.isAdmin && !isPrivate && !isCurrentUser && (
+                  <button 
+                    className="mt-1 text-xs text-[#F0B90B] hover:underline flex items-center"
+                    onClick={() => {
+                      // This would open a private chat in a real implementation
+                      console.log('Open private chat with admin');
+                    }}
+                  >
+                    <MessageCircle className="h-3 w-3 mr-1" />
+                    Message privately
+                  </button>
+                )}
               </div>
             </div>
           );

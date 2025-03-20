@@ -5,6 +5,7 @@ export interface ChatUser {
   avatar: string;
   country: string;
   gender: 'male' | 'female';
+  isAdmin?: boolean;
 }
 
 export interface ChatMessage {
@@ -13,4 +14,15 @@ export interface ChatMessage {
   message: string;
   timestamp: Date;
   type: 'withdrawal' | 'deposit' | 'price' | 'news' | 'general';
+  media?: {
+    type: 'image' | 'video';
+    url: string;
+  };
+  isPrivate?: boolean;
+  recipientId?: string;
+}
+
+export interface ChatNotification {
+  count: number;
+  lastSeen: Date;
 }
