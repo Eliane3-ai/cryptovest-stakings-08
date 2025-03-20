@@ -62,7 +62,7 @@ export const GasFeeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         gasFeeBalance, 
         isKycVerified, 
         increaseGasFee, 
-        setKycVerified, 
+        setKycVerified: setIsKycVerified, 
         canWithdraw,
         withdrawalErrorReason
       }}

@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { cn } from "@/lib/utils";
 import { Wallet, ChevronDown, AlertTriangle } from "lucide-react";
 import WalletActions from "@/components/WalletActions";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useGasFee } from '@/contexts/GasFeeContext';
+import { getTranslation } from '@/utils/translations';
 
 interface WalletHeaderProps {
   totalBalance: number;
