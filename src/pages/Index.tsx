@@ -4,17 +4,18 @@ import { Bitcoin, Coins, Menu } from "lucide-react";
 import { toast } from "sonner";
 import WalletHeader from "@/components/WalletHeader";
 import { TransactionType } from "@/components/TransactionItem";
-import TradingViewWidget from "@/components/TradingViewWidget";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import MainSidebar from "@/components/MainSidebar";
 import TabsSection from "@/components/TabsSection";
 import AssetsList from "@/components/AssetsList";
 import TransactionsList from "@/components/TransactionsList";
 import StakingSection from "@/components/StakingSection";
+import LiveMarketView from "@/components/LiveMarketView";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 
-// Token data
-const tokens = [
+// Initial tokens data
+const initialTokens = [
   {
     name: "Bitcoin",
     symbol: "BTC",
@@ -81,7 +82,7 @@ const tokens = [
   },
 ];
 
-// Staking data
+// Initial staking data
 const stakingOptions = [
   {
     token: "Ethereum",
@@ -158,8 +159,24 @@ type Tab = 'assets' | 'transactions' | 'staking';
 const Index: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('assets');
   const [transactions, setTransactions] = useState(initialTransactions);
+  const [tokens, setTokens] = useState(initialTokens);
   const totalBalance = tokens.reduce((sum, token) => sum + token.usdValue, 0);
   const { language } = useLanguage();
+
+  // Function to update token balance and value
+  const updateTokenBalance = (symbol: string, amount: number, usdValue: number) => {
+    setTokens(prevTokens => 
+      prevTokens.map(token => 
+        token.symbol === symbol 
+          ? { 
+              ...token, 
+              balance: token.balance + amount,
+              usdValue: token.usdValue + usdValue
+            } 
+          : token
+      )
+    );
+  };
 
   // Simulate receiving funds at regular intervals
   useEffect(() => {
@@ -167,6 +184,9 @@ const Index: React.FC = () => {
       const randomToken = tokens[Math.floor(Math.random() * tokens.length)];
       const randomAmount = parseFloat((Math.random() * 0.1).toFixed(6));
       const randomUsdValue = parseFloat((randomAmount * (randomToken.usdValue / randomToken.balance)).toFixed(2));
+      
+      // Update token balance
+      updateTokenBalance(randomToken.symbol, randomAmount, randomUsdValue);
       
       const newTransaction = {
         type: 'receive' as TransactionType,
@@ -214,7 +234,29 @@ const Index: React.FC = () => {
     }, 40000); // Every 40 seconds
     
     return () => clearInterval(fundingInterval);
-  }, [language]);
+  }, [language, tokens]);
+
+  // Update staking rewards periodically
+  useEffect(() => {
+    const stakingRewardsInterval = setInterval(() => {
+      // Update staking balances for each token
+      tokens.forEach(token => {
+        const stakingOption = stakingOptions.find(option => option.symbol === token.symbol);
+        if (stakingOption && stakingOption.stakedAmount > 0) {
+          // Calculate daily reward based on APY
+          const dailyRewardPercent = stakingOption.apy / 365;
+          const dailyRewardAmount = stakingOption.stakedAmount * (dailyRewardPercent / 100);
+          
+          // We'll add a small fraction of the daily reward every minute for real-time effect
+          const rewardIncrement = dailyRewardAmount / (24 * 60) * 10; // 10 minutes worth
+          
+          updateTokenBalance(token.symbol, rewardIncrement, 0);
+        }
+      });
+    }, 60000); // Update rewards every minute
+    
+    return () => clearInterval(stakingRewardsInterval);
+  }, [tokens]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -241,8 +283,8 @@ const Index: React.FC = () => {
           {/* Wallet Header with actions integrated */}
           <WalletHeader totalBalance={totalBalance} />
           
-          {/* Trading View Widget (slideshow) */}
-          <TradingViewWidget />
+          {/* Live Market View */}
+          <LiveMarketView />
           
           {/* Tab Navigation */}
           <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} />
