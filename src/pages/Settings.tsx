@@ -8,6 +8,7 @@ import KYCVerificationSection from '@/components/KYCVerificationSection';
 import ApplicationSettingsSection from '@/components/ApplicationSettingsSection';
 import SecuritySettingsSection from '@/components/SecuritySettingsSection';
 import DepositAddresses from '@/components/DepositAddresses';
+import PaymentMethodsSection from '@/components/PaymentMethodsSection';
 
 const Settings: React.FC = () => {
   const { language } = useLanguage();
@@ -26,6 +27,9 @@ const Settings: React.FC = () => {
 
         {/* KYC Verification Section */}
         <KYCVerificationSection />
+        
+        {/* Payment Methods Section */}
+        <PaymentMethodsSection />
         
         {/* Deposit Addresses */}
         <DepositAddresses className="mb-6" />

@@ -22,6 +22,7 @@ import Winners from "./pages/Winners";
 import WalletAddress from "./pages/WalletAddress";
 import Referral from "./pages/Referral";
 import Auth from "./pages/Auth";
+import Contact from "./pages/Contact";
 import AiAssistant from "./components/AiAssistant";
 import AuthGuard from "./components/AuthGuard";
 
@@ -44,6 +45,7 @@ const App = () => (
                   <Route path="/chat" element={<Chat />} />
                   <Route path="/referral" element={<Referral />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/contact" element={<Contact />} />
                   
                   {/* Protected Routes - require authentication */}
                   <Route element={<AuthGuard />}>
