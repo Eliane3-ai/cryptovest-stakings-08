@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Message } from './types';
-import { useNavigate } from 'react-router-dom';
 
 interface MessageItemProps {
   message: Message;
