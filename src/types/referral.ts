@@ -4,7 +4,7 @@ export interface Referral {
   referrer_id: string;
   referred_id: string | null;
   code: string;
-  status: 'pending' | 'completed';
+  status: 'pending' | 'completed' | string;
   reward: number;
   created_at: string;
   completed_at: string | null;

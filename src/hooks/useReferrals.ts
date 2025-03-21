@@ -63,14 +63,22 @@ export const useReferrals = () => {
           .eq('referrer_id', user.id);
           
         if (data) {
-          setReferrals(data);
+          // Ensure the data conforms to the Referral type
+          const typedReferrals: Referral[] = data.map(ref => ({
+            ...ref,
+            status: ref.status as 'pending' | 'completed' | string,
+            referred_id: ref.referred_id || null,
+            completed_at: ref.completed_at || null
+          }));
+          
+          setReferrals(typedReferrals);
           
           // Calculate stats
-          const completed = data.filter(r => r.status === 'completed');
+          const completed = typedReferrals.filter(r => r.status === 'completed');
           setStats({
-            totalReferrals: data.length,
+            totalReferrals: typedReferrals.length,
             completedReferrals: completed.length,
-            pendingReferrals: data.length - completed.length,
+            pendingReferrals: typedReferrals.length - completed.length,
             totalEarned: completed.length * 3 // Assuming 3 USDT per completed referral
           });
         }
@@ -96,14 +104,26 @@ export const useReferrals = () => {
         },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            setReferrals(prev => [...prev, payload.new as Referral]);
+            const newReferral = payload.new as Referral;
+            setReferrals(prev => [...prev, {
+              ...newReferral,
+              referred_id: newReferral.referred_id || null,
+              completed_at: newReferral.completed_at || null,
+              status: newReferral.status as 'pending' | 'completed' | string
+            }]);
+            
             toast({
               title: "New referral created!",
               description: "Your referral link is ready to be shared.",
             });
           } else if (payload.eventType === 'UPDATE') {
             setReferrals(prev => 
-              prev.map(ref => ref.id === payload.new.id ? payload.new as Referral : ref)
+              prev.map(ref => ref.id === payload.new.id ? {
+                ...payload.new as Referral,
+                referred_id: payload.new.referred_id || null,
+                completed_at: payload.new.completed_at || null,
+                status: payload.new.status as 'pending' | 'completed' | string
+              } : ref)
             );
             
             if (payload.old.status === 'pending' && payload.new.status === 'completed') {
