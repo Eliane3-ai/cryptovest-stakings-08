@@ -8,19 +8,16 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import useReferrals from '@/hooks/useReferrals';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Referral: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { referrals, referralCode, stats, isLoading, referralLink } = useReferrals();
   const [copied, setCopied] = useState(false);
-  
-  // Mock data (in a real app, this would come from an API)
-  const referralCode = "CRYPTOVEST" + Math.floor(Math.random() * 1000);
-  const referralLink = `https://cryptovest.com/ref/${referralCode}`;
-  const referralBalance = 3.0;
-  const totalReferrals = 4;
-  const pendingReferrals = 1;
-  const completedReferrals = 3;
   
   // Daily tasks (in a real app, this would come from an API)
   const dailyTasks = [
@@ -38,15 +35,15 @@ const Referral: React.FC = () => {
       description: 'Share your referral link with friends',
       reward: 1.0,
       completed: false,
-      progress: 50
+      progress: stats.completedReferrals > 0 ? (stats.completedReferrals / 2) * 100 : 0
     },
     {
       id: '3',
       title: 'Complete KYC verification',
       description: 'Verify your identity to unlock full platform features',
       reward: 2.0,
-      completed: true,
-      progress: 100
+      completed: user !== null,
+      progress: user !== null ? 100 : 0
     }
   ];
   
@@ -60,6 +57,66 @@ const Referral: React.FC = () => {
     setTimeout(() => setCopied(false), 3000);
   };
   
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#0B0E11] text-white flex items-center justify-center">
+        <Card className="border-[#474D57] bg-[#1E2026] max-w-md w-full mx-4">
+          <CardHeader>
+            <CardTitle>Referral Program</CardTitle>
+            <CardDescription className="text-gray-400">
+              Sign in to access the referral program
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center py-8">
+            <Users className="h-16 w-16 text-[#F0B90B] mx-auto mb-4" />
+            <h3 className="text-xl font-bold mb-2">Join Our Referral Program</h3>
+            <p className="text-gray-400 mb-6">Sign in or create an account to start earning rewards by inviting friends.</p>
+            <Button 
+              className="bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black"
+              onClick={() => navigate('/auth')}
+            >
+              Sign In / Sign Up
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#0B0E11] text-white">
+        <div className="max-w-5xl mx-auto px-4 py-8">
+          <div className="flex items-center gap-3 mb-6">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => navigate('/wallet')}
+              className="text-white hover:bg-white/10"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-xl font-bold">Refer & Earn</h1>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="border-[#474D57] bg-[#1E2026]">
+                <CardHeader className="pb-2">
+                  <Skeleton className="h-6 w-40 bg-[#2B3139]" />
+                  <Skeleton className="h-4 w-32 mt-2 bg-[#2B3139]" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Skeleton className="h-16 w-full bg-[#2B3139]" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="min-h-screen bg-[#0B0E11] text-white">
       <div className="max-w-5xl mx-auto px-4 py-8">
@@ -67,7 +124,7 @@ const Referral: React.FC = () => {
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/wallet')}
             className="text-white hover:bg-white/10"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -89,15 +146,18 @@ const Referral: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="flex items-baseline">
-                <span className="text-3xl font-bold">{referralBalance.toFixed(2)}</span>
+                <span className="text-3xl font-bold">{stats.totalEarned.toFixed(2)}</span>
                 <span className="ml-2 text-lg text-[#F0B90B]">USDT</span>
               </div>
               <div className="text-xs text-gray-400 mt-1">
-                ~ ${(referralBalance * 1).toFixed(2)} USD
+                ~ ${(stats.totalEarned * 1).toFixed(2)} USD
               </div>
             </CardContent>
             <CardFooter className="pt-0">
-              <Button className="w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black">
+              <Button 
+                className="w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black"
+                disabled={stats.totalEarned <= 0}
+              >
                 Withdraw Rewards
               </Button>
             </CardFooter>
@@ -117,19 +177,19 @@ const Referral: React.FC = () => {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Total Referrals</span>
-                <span className="font-semibold">{totalReferrals}</span>
+                <span className="font-semibold">{stats.totalReferrals}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Completed</span>
-                <span className="font-semibold text-green-500">{completedReferrals}</span>
+                <span className="font-semibold text-green-500">{stats.completedReferrals}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Pending</span>
-                <span className="font-semibold text-yellow-500">{pendingReferrals}</span>
+                <span className="font-semibold text-yellow-500">{stats.pendingReferrals}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Total Earned</span>
-                <span className="font-semibold text-[#F0B90B]">{(completedReferrals * 3).toFixed(2)} USDT</span>
+                <span className="font-semibold text-[#F0B90B]">{stats.totalEarned.toFixed(2)} USDT</span>
               </div>
             </CardContent>
           </Card>
@@ -167,11 +227,16 @@ const Referral: React.FC = () => {
                 className="w-full"
                 variant="outline"
                 onClick={() => {
-                  // In a real app, this would open a share dialog
-                  toast({
-                    title: "Share with friends",
-                    description: "Share options would appear here in a real app.",
-                  });
+                  // This would open native share dialog in a real app
+                  if (navigator.share) {
+                    navigator.share({
+                      title: 'Join Crypto Vest Staking',
+                      text: `Join me on Crypto Vest and get staking rewards! Use my referral code: ${referralCode}`,
+                      url: referralLink,
+                    }).catch(console.error);
+                  } else {
+                    copyToClipboard();
+                  }
                 }}
               >
                 Share Link
@@ -251,7 +316,10 @@ const Referral: React.FC = () => {
             ))}
           </CardContent>
           <CardFooter>
-            <Button className="w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black">
+            <Button 
+              className="w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black"
+              disabled={!dailyTasks.some(task => task.completed)}
+            >
               Claim Completed Tasks
             </Button>
           </CardFooter>

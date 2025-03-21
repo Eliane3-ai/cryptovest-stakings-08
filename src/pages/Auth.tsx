@@ -1,0 +1,311 @@
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { ArrowLeft, Mail, Lock, User, Link } from 'lucide-react';
+
+const Auth: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+  const { user, signIn, signUp } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('login');
+  
+  // Get referral code from URL if present
+  const queryParams = new URLSearchParams(location.search);
+  const referralCode = queryParams.get('ref');
+  
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/wallet');
+    }
+  }, [user, navigate]);
+  
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const { error } = await signIn(email, password);
+      
+      if (error) {
+        toast({
+          title: "Login Failed",
+          description: error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Successful login will redirect via the useEffect
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: "An error occurred",
+        description: "Please try again later",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (password !== confirmPassword) {
+      toast({
+        title: "Passwords do not match",
+        description: "Please make sure your passwords match",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      const userData = {
+        username,
+        full_name: username, // Using username as full_name for now
+        ...(referralCode && { referral_code: referralCode })
+      };
+      
+      const { error } = await signUp(email, password, userData);
+      
+      if (error) {
+        toast({
+          title: "Registration Failed",
+          description: error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      toast({
+        title: "Registration Successful",
+        description: "Your account has been created. You can now log in.",
+      });
+      
+      setActiveTab('login');
+    } catch (error) {
+      console.error('Signup error:', error);
+      toast({
+        title: "An error occurred",
+        description: "Please try again later",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  return (
+    <div className="min-h-screen bg-[#0B0E11] flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        <div className="mb-6 flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigate('/')}
+            className="text-white hover:bg-white/10"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-2xl font-bold text-white">Crypto Vest</h1>
+        </div>
+        
+        <Card className="border-[#474D57] bg-[#1E2026]">
+          <CardHeader>
+            <CardTitle className="text-white">Welcome to Crypto Vest</CardTitle>
+            <CardDescription className="text-gray-400">
+              {activeTab === 'login' 
+                ? 'Sign in to access your account' 
+                : 'Create a new account to start earning'}
+            </CardDescription>
+          </CardHeader>
+          
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid grid-cols-2 mx-6">
+              <TabsTrigger value="login">Login</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="login">
+              <form onSubmit={handleLogin}>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-white">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="your.email@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-10 bg-[#2B3139] border-[#474D57]"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-white">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="pl-10 bg-[#2B3139] border-[#474D57]"
+                        required
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+                
+                <CardFooter className="flex flex-col">
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black"
+                    disabled={loading}
+                  >
+                    {loading ? 'Signing in...' : 'Sign In'}
+                  </Button>
+                  
+                  <p className="mt-4 text-center text-sm text-gray-400">
+                    Don't have an account?{' '}
+                    <button 
+                      type="button"
+                      onClick={() => setActiveTab('signup')}
+                      className="text-[#F0B90B] hover:text-[#F0B90B]/90"
+                    >
+                      Sign up
+                    </button>
+                  </p>
+                </CardFooter>
+              </form>
+            </TabsContent>
+            
+            <TabsContent value="signup">
+              <form onSubmit={handleSignup}>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email" className="text-white">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      <Input
+                        id="signup-email"
+                        type="email"
+                        placeholder="your.email@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-10 bg-[#2B3139] border-[#474D57]"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="username" className="text-white">Username</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      <Input
+                        id="username"
+                        type="text"
+                        placeholder="johndoe"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="pl-10 bg-[#2B3139] border-[#474D57]"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password" className="text-white">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      <Input
+                        id="signup-password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="pl-10 bg-[#2B3139] border-[#474D57]"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password" className="text-white">Confirm Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      <Input
+                        id="confirm-password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="pl-10 bg-[#2B3139] border-[#474D57]"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  {referralCode && (
+                    <div className="p-3 bg-[#F0B90B]/10 border border-[#F0B90B]/20 rounded-lg flex items-center gap-2">
+                      <Link className="h-4 w-4 text-[#F0B90B]" />
+                      <span className="text-sm text-[#F0B90B]">
+                        You were invited by a friend with code: {referralCode}
+                      </span>
+                    </div>
+                  )}
+                </CardContent>
+                
+                <CardFooter className="flex flex-col">
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black"
+                    disabled={loading}
+                  >
+                    {loading ? 'Creating Account...' : 'Create Account'}
+                  </Button>
+                  
+                  <p className="mt-4 text-center text-sm text-gray-400">
+                    Already have an account?{' '}
+                    <button 
+                      type="button"
+                      onClick={() => setActiveTab('login')}
+                      className="text-[#F0B90B] hover:text-[#F0B90B]/90"
+                    >
+                      Sign in
+                    </button>
+                  </p>
+                </CardFooter>
+              </form>
+            </TabsContent>
+          </Tabs>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default Auth;
