@@ -35,13 +35,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           
           // Check if this is the first login for the user
           if (event === 'SIGNED_IN') {
-            const { data, error } = await supabase
+            const { data } = await supabase
               .from('profiles')
               .select('is_funded')
               .eq('id', session.user.id)
               .single();
               
-            if (data && !data.is_funded) {
+            if (data && data.is_funded === false) {
               setIsFirstLogin(true);
             }
           }
@@ -131,7 +131,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Mark user as funded in the database
       await supabase
         .from('profiles')
-        .update({ is_funded: true })
+        .update({ 
+          is_funded: true,
+          staking_knowledge: knowledgeLevel
+        })
         .eq('id', userId);
       
       // Return the funding amount based on knowledge level
