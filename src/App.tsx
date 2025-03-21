@@ -17,6 +17,7 @@ import Deposit from "./pages/Deposit";
 import NotFound from "./pages/NotFound";
 import Chat from "./pages/Chat";
 import Winners from "./pages/Winners";
+import WalletAddress from "./pages/WalletAddress";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
                 <Route path="/deposit" element={<Deposit />} />
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/winners" element={<Winners />} />
+                <Route path="/wallet-address" element={<WalletAddress />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

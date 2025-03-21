@@ -24,14 +24,14 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         onClick={onWithdraw}
       >
         <ArrowDownToLine className="h-5 w-5" />
-        <span className="text-base font-semibold">Withdraw</span>
+        <span className="text-base font-semibold">{getTranslation('withdraw', language) || 'Withdraw'}</span>
       </button>
       <button 
         className="flex items-center justify-center gap-2 bg-[#2B3139] border border-[#474D57] text-white py-2.5 px-4 rounded-lg font-medium transition-all hover:bg-[#2B3139]/80 focus:ring-2 focus:ring-[#F0B90B] focus:ring-opacity-50"
         onClick={onDeposit}
       >
         <ArrowUpFromLine className="h-5 w-5" />
-        <span className="text-base font-semibold">Deposit</span>
+        <span className="text-base font-semibold">{getTranslation('deposit', language) || 'Deposit'}</span>
       </button>
     </div>
   );

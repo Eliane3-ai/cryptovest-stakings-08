@@ -27,3 +27,18 @@ export interface ChatNotification {
   count: number;
   lastSeen: Date;
 }
+
+export interface ChatMessagesProps {
+  maxHeight: string;
+  className: string;
+  onReplySwipe: (messageId: string) => void;
+}
+
+export interface WalletAddress {
+  id: string;
+  name: string;
+  address: string;
+  network: string;
+  coin: string;
+  isDefault: boolean;
+}

@@ -1,4 +1,3 @@
-
 import { ChatUser, ChatMessage } from '@/types/chat';
 
 // Country list for diversity
@@ -17,7 +16,46 @@ const exchanges = ['Binance', 'OKX', 'BITGET', 'Trust Wallet', 'Kraken', 'Coinba
 // Popular cryptocurrencies
 const cryptocurrencies = ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE', 'DOT', 'AVAX', 'MATIC', 'LINK', 'UNI', 'ATOM'];
 
-// First names for diversity
+// Country-specific names for more authenticity
+const countrySpecificNames: Record<string, { male: string[], female: string[], lastNames: string[] }> = {
+  'USA': {
+    male: ['James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Joseph', 'Thomas'],
+    female: ['Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth', 'Barbara', 'Susan', 'Jessica', 'Sarah'],
+    lastNames: ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis', 'Wilson', 'Taylor']
+  },
+  'UK': {
+    male: ['Oliver', 'Harry', 'George', 'Noah', 'Jack', 'Jacob', 'Leo', 'Oscar', 'Charlie'],
+    female: ['Olivia', 'Amelia', 'Isla', 'Ava', 'Emily', 'Isabella', 'Mia', 'Poppy', 'Ella'],
+    lastNames: ['Smith', 'Jones', 'Williams', 'Taylor', 'Brown', 'Davies', 'Evans', 'Wilson', 'Thomas']
+  },
+  'Brazil': {
+    male: ['Miguel', 'Arthur', 'Bernardo', 'Heitor', 'Davi', 'Lorenzo', 'Théo', 'Pedro', 'Gabriel'],
+    female: ['Maria', 'Alice', 'Sophia', 'Laura', 'Isabella', 'Manuela', 'Júlia', 'Helena', 'Valentina'],
+    lastNames: ['Silva', 'Santos', 'Oliveira', 'Souza', 'Lima', 'Pereira', 'Costa', 'Rodrigues', 'Almeida']
+  },
+  'Russia': {
+    male: ['Alexander', 'Dmitri', 'Maxim', 'Sergei', 'Ivan', 'Andrei', 'Nikita', 'Mikhail', 'Artem'],
+    female: ['Anastasia', 'Maria', 'Daria', 'Anna', 'Olga', 'Tatiana', 'Ekaterina', 'Natalia', 'Polina'],
+    lastNames: ['Ivanov', 'Smirnov', 'Kuznetsov', 'Popov', 'Vasiliev', 'Petrov', 'Sokolov', 'Mikhailov', 'Novikov']
+  },
+  'Japan': {
+    male: ['Haruto', 'Yuto', 'Sota', 'Yuki', 'Hayato', 'Haruki', 'Ryusei', 'Koki', 'Sora'],
+    female: ['Yui', 'Aoi', 'Hina', 'Sakura', 'Rio', 'Koharu', 'Akari', 'Nanami', 'Honoka'],
+    lastNames: ['Sato', 'Suzuki', 'Takahashi', 'Tanaka', 'Watanabe', 'Ito', 'Yamamoto', 'Nakamura', 'Kobayashi']
+  },
+  'China': {
+    male: ['Wei', 'Jian', 'Ming', 'Hao', 'Fang', 'Lei', 'Cheng', 'Jun', 'Yi'],
+    female: ['Mei', 'Lin', 'Xiu', 'Ying', 'Na', 'Zhen', 'Yan', 'Qing', 'Yue'],
+    lastNames: ['Wang', 'Li', 'Zhang', 'Liu', 'Chen', 'Yang', 'Huang', 'Zhao', 'Wu']
+  },
+  'Indonesia': {
+    male: ['Budi', 'Agus', 'Hadi', 'Bambang', 'Dedi', 'Wawan', 'Yusuf', 'Arief', 'Dian'],
+    female: ['Siti', 'Ani', 'Yuli', 'Dewi', 'Rina', 'Lina', 'Wati', 'Yanti', 'Lia'],
+    lastNames: ['Wijaya', 'Suryanto', 'Hartono', 'Santoso', 'Tanoto', 'Wibowo', 'Gunawan', 'Hakim', 'Halim']
+  }
+};
+
+// Fallback names for countries not specifically mapped
 const maleNames = [
   'James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Joseph', 'Thomas', 'Charles',
   'Mohammed', 'Ali', 'Omar', 'Wei', 'Chen', 'Raj', 'Vikram', 'Juan', 'Carlos', 'Miguel',
@@ -44,9 +82,30 @@ const getRandomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-// Generate a random avatar URL
-const getRandomAvatar = (gender: string, index: number) => {
+// Generate a random avatar URL that matches the country/gender of the user
+const getRandomAvatar = (gender: string, country: string, index: number) => {
+  // Here we would ideally have country-specific avatars, but for now we'll just use the generic ones
   return `https://randomuser.me/api/portraits/${gender === 'male' ? 'men' : 'women'}/${index % 100}.jpg`;
+};
+
+// Get a name appropriate for the country and gender
+const getCountrySpecificName = (country: string, gender: 'male' | 'female'): {firstName: string, lastName: string} => {
+  // If we have specific names for this country, use them
+  if (countrySpecificNames[country]) {
+    const names = countrySpecificNames[country];
+    const namesList = gender === 'male' ? names.male : names.female;
+    const firstName = namesList[getRandomInt(0, namesList.length - 1)];
+    const lastName = names.lastNames[getRandomInt(0, names.lastNames.length - 1)];
+    return { firstName, lastName };
+  }
+  
+  // Otherwise use the generic pool
+  const firstName = gender === 'male' 
+    ? maleNames[getRandomInt(0, maleNames.length - 1)] 
+    : femaleNames[getRandomInt(0, femaleNames.length - 1)];
+  const lastName = lastNames[getRandomInt(0, lastNames.length - 1)];
+  
+  return { firstName, lastName };
 };
 
 // Generate cryptocurrency price message
@@ -165,22 +224,19 @@ export const generateMessage = (type: 'withdrawal' | 'deposit' | 'price' | 'news
   }
 };
 
-// Generate 500 unique users
+// Generate unique users with country-specific names
 export const generateUsers = (count: number = 500): ChatUser[] => {
   const users: ChatUser[] = [];
   
   for (let i = 0; i < count; i++) {
     const gender = Math.random() > 0.5 ? 'male' : 'female';
-    const firstName = gender === 'male' 
-      ? maleNames[getRandomInt(0, maleNames.length - 1)] 
-      : femaleNames[getRandomInt(0, femaleNames.length - 1)];
-    const lastName = lastNames[getRandomInt(0, lastNames.length - 1)];
     const country = countries[getRandomInt(0, countries.length - 1)];
+    const { firstName, lastName } = getCountrySpecificName(country, gender as 'male' | 'female');
     
     users.push({
       id: `user-${i}`,
       name: `${firstName} ${lastName}`,
-      avatar: getRandomAvatar(gender, i),
+      avatar: getRandomAvatar(gender, country, i),
       country,
       gender: gender as 'male' | 'female'
     });
