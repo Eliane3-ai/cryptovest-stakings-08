@@ -2,7 +2,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { AuthContextType, AuthProviderProps, UserProfile } from '@/types/auth';
+import { AuthContextType, AuthProviderProps, UserProfile, StakingKnowledgeLevel } from '@/types/auth';
+import { initialTokens } from '@/data/initialTokens';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -19,6 +20,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFirstLogin, setIsFirstLogin] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener
@@ -30,8 +32,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (session?.user) {
           const profile = await getProfile(session.user.id);
           setProfile(profile);
+          
+          // Check if this is the first login for the user
+          if (event === 'SIGNED_IN') {
+            const { data, error } = await supabase
+              .from('profiles')
+              .select('is_funded')
+              .eq('id', session.user.id)
+              .single();
+              
+            if (data && !data.is_funded) {
+              setIsFirstLogin(true);
+            }
+          }
         } else {
           setProfile(null);
+          setIsFirstLogin(false);
         }
       }
     );
@@ -58,6 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     username?: string;
     full_name?: string;
     referral_code?: string;
+    staking_knowledge?: StakingKnowledgeLevel;
   }) => {
     try {
       const { error } = await supabase.auth.signUp({
@@ -108,15 +125,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Fund user based on their staking knowledge level
+  const fundUserWallet = async (userId: string, knowledgeLevel: StakingKnowledgeLevel) => {
+    try {
+      // Mark user as funded in the database
+      await supabase
+        .from('profiles')
+        .update({ is_funded: true })
+        .eq('id', userId);
+      
+      // Return the funding amount based on knowledge level
+      switch (knowledgeLevel) {
+        case 'beginner':
+          return 15790;
+        case 'intermediate':
+          return 75670;
+        case 'expert':
+          return 350900;
+        default:
+          return 15790;
+      }
+    } catch (error) {
+      console.error('Error funding user:', error);
+      return 0;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
       profile,
       isLoading,
+      isFirstLogin,
       signUp,
       signIn,
       signOut,
-      getProfile
+      getProfile,
+      fundUserWallet
     }}>
       {children}
     </AuthContext.Provider>

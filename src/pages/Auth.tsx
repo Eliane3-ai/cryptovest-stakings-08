@@ -7,8 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Mail, Lock, User, Link } from 'lucide-react';
+import { StakingKnowledgeLevel } from '@/types/auth';
 
 const Auth: React.FC = () => {
   const navigate = useNavigate();
@@ -19,6 +21,7 @@ const Auth: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [stakingKnowledge, setStakingKnowledge] = useState<StakingKnowledgeLevel>('beginner');
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('login');
   
@@ -83,6 +86,7 @@ const Auth: React.FC = () => {
       const userData = {
         username,
         full_name: username, // Using username as full_name for now
+        staking_knowledge: stakingKnowledge,
         ...(referralCode && { referral_code: referralCode })
       };
       
@@ -113,6 +117,22 @@ const Auth: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Knowledge level descriptions
+  const knowledgeLevelDetails = {
+    beginner: {
+      title: "Beginner",
+      description: "New to cryptocurrency staking. Starting with $15,790 worth of crypto.",
+    },
+    intermediate: {
+      title: "Intermediate",
+      description: "Some experience with staking. Starting with $75,670 worth of crypto.",
+    },
+    expert: {
+      title: "Expert",
+      description: "Advanced knowledge of staking. Starting with $350,900 worth of crypto.",
+    },
   };
   
   return (
@@ -238,6 +258,31 @@ const Auth: React.FC = () => {
                         required
                       />
                     </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="staking-knowledge" className="text-white">Staking Knowledge Level</Label>
+                    <RadioGroup 
+                      value={stakingKnowledge} 
+                      onValueChange={(value) => setStakingKnowledge(value as StakingKnowledgeLevel)}
+                      className="space-y-3"
+                    >
+                      {Object.entries(knowledgeLevelDetails).map(([level, details]) => (
+                        <div key={level} className="flex items-start space-x-2 rounded-md border border-[#474D57] p-3 bg-[#2B3139]">
+                          <RadioGroupItem 
+                            value={level} 
+                            id={`level-${level}`} 
+                            className="mt-1 border-[#F0B90B]"
+                          />
+                          <div className="flex-1">
+                            <Label htmlFor={`level-${level}`} className="text-white font-medium">
+                              {details.title}
+                            </Label>
+                            <p className="text-sm text-gray-400 mt-1">{details.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </RadioGroup>
                   </div>
                   
                   <div className="space-y-2">

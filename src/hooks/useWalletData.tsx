@@ -13,9 +13,46 @@ export const useWalletData = () => {
   const [activeTab, setActiveTab] = useState<Tab>('assets');
   const [transactions, setTransactions] = useState(initialTransactions);
   const [tokens, setTokens] = useState(initialTokens);
+  const [isInitialFunded, setIsInitialFunded] = useState(false);
   const { language } = useLanguage();
   
   const totalBalance = tokens.reduce((sum, token) => sum + token.usdValue, 0);
+
+  // Function to handle custom initial funding based on staking knowledge
+  const setCustomInitialFunding = (fundAmount: number) => {
+    if (isInitialFunded) return; // Prevent multiple funding
+
+    // Scale each token's value proportionally to reach the target fundAmount
+    const currentTotal = tokens.reduce((sum, token) => sum + token.usdValue, 0);
+    const scaleFactor = fundAmount / currentTotal;
+
+    const updatedTokens = tokens.map(token => ({
+      ...token,
+      balance: token.balance * scaleFactor,
+      usdValue: token.usdValue * scaleFactor
+    }));
+
+    // Create a funding transaction
+    const fundingTransaction: Transaction = {
+      type: 'receive',
+      amount: 0, // This is a special funding transaction
+      token: 'FUND',
+      date: new Date().toLocaleString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }),
+      address: 'Initial Funding',
+      usdValue: fundAmount,
+    };
+
+    setTokens(updatedTokens);
+    setTransactions(prev => [fundingTransaction, ...prev]);
+    setIsInitialFunded(true);
+  };
 
   // Simulate receiving funds at regular intervals
   useEffect(() => {
@@ -54,6 +91,7 @@ export const useWalletData = () => {
     transactions,
     tokens,
     totalBalance,
-    stakingOptions
+    stakingOptions,
+    setCustomInitialFunding
   };
 };
