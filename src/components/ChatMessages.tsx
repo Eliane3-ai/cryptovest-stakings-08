@@ -6,13 +6,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MessageCircle, Lock } from 'lucide-react';
+import { ChatMessagesProps } from '@/types/chat';
 
-interface ChatMessagesProps {
-  maxHeight?: string;
-  className?: string;
-}
-
-const ChatMessages: React.FC<ChatMessagesProps> = ({ maxHeight = '400px', className = '' }) => {
+const ChatMessages: React.FC<ChatMessagesProps> = ({ maxHeight = '400px', className = '', onReplySwipe }) => {
   const { messages, users, isLoading, adminBot } = useChatContext();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -114,6 +110,11 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ maxHeight = '400px', classN
               className={`flex items-start gap-3 animate-in fade-in slide-in-from-bottom-5 duration-300 ${
                 isPrivate ? 'pl-2 border-l-2 border-[#F0B90B]' : ''
               }`}
+              onClick={() => {
+                if (!isCurrentUser && !isPrivate && onReplySwipe) {
+                  onReplySwipe(message.id);
+                }
+              }}
             >
               <Avatar className={user.isAdmin ? 'ring-2 ring-[#F0B90B]' : ''}>
                 <AvatarImage src={user.avatar} alt={user.name} />
