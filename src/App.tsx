@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import Chat from "./pages/Chat";
 import Winners from "./pages/Winners";
 import WalletAddress from "./pages/WalletAddress";
+import Referral from "./pages/Referral";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/winners" element={<Winners />} />
                 <Route path="/wallet-address" element={<WalletAddress />} />
+                <Route path="/referral" element={<Referral />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

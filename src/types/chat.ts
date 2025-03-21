@@ -42,3 +42,28 @@ export interface WalletAddress {
   coin: string;
   isDefault: boolean;
 }
+
+export interface Referral {
+  id: string;
+  userId: string;
+  code: string;
+  referredUserId?: string;
+  status: 'pending' | 'completed';
+  createdAt: Date;
+}
+
+export interface ReferralStats {
+  totalReferrals: number;
+  completedReferrals: number;
+  pendingReferrals: number;
+  totalEarned: number;
+}
+
+export interface DailyTask {
+  id: string;
+  title: string;
+  description: string;
+  reward: number;
+  isCompleted: boolean;
+  expiresAt: Date;
+}

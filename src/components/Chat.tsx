@@ -25,7 +25,7 @@ const Chat: React.FC<ChatProps> = ({ className = '' }) => {
     resetNotification
   } = useChatContext();
   
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true); // Default to expanded
   const [showPrivateChat, setShowPrivateChat] = useState(false);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
@@ -50,8 +50,8 @@ const Chat: React.FC<ChatProps> = ({ className = '' }) => {
       )}
       
       {chatOpen && (
-        <Card className={`shadow-xl transition-all duration-300 ${className} ${isExpanded ? 'h-[550px]' : 'h-[400px]'}`}>
-          <CardHeader className="p-0">
+        <Card className={`shadow-xl transition-all duration-300 ${className} flex flex-col`}>
+          <CardHeader className="p-0 flex-shrink-0">
             <ChatHeader 
               messageCount={messages.length}
               adminBot={adminBot}
@@ -61,14 +61,14 @@ const Chat: React.FC<ChatProps> = ({ className = '' }) => {
               setChatOpen={setChatOpen}
             />
           </CardHeader>
-          <CardContent className="p-0">
+          <CardContent className="p-0 flex-grow overflow-hidden">
             <ChatMessages 
-              maxHeight={isExpanded ? '420px' : '280px'} 
-              className="rounded-none"
+              maxHeight="100%" 
+              className="rounded-none h-full"
               onReplySwipe={handleReplySwipe}
             />
           </CardContent>
-          <CardFooter className="p-3 border-t flex-col items-stretch">
+          <CardFooter className="p-3 border-t flex-col items-stretch flex-shrink-0">
             <ChatInput 
               onSendMessage={sendMessage}
               replyingTo={replyingTo}

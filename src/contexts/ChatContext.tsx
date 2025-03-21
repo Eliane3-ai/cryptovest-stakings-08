@@ -33,26 +33,26 @@ interface ChatProviderProps {
 // Admin bot responses for different message types
 const adminResponses = {
   withdrawal: [
-    "Congratulations on your successful withdrawal! 🎉 Our platform ensures fast and secure transactions.",
-    "Amazing! Your funds have been successfully withdrawn. We're happy to provide a seamless experience.",
-    "Great job on completing your withdrawal! This is why our staking platform is trusted by thousands.",
-    "Thank you for sharing your successful withdrawal! Our community appreciates the transparency."
+    "Congratulations on your successful withdrawal! 🎉 Mr. Richard Teng and the Crypto Vest automated Bot ensure fast and secure transactions for all our users.",
+    "Amazing! Your funds have been successfully withdrawn. Mr. Richard Teng's leadership at Crypto Vest provides this seamless experience for all our stakers.",
+    "Great job on completing your withdrawal! This is why our Crypto Vest staking platform, under Mr. Richard Teng's guidance, is trusted by thousands.",
+    "Thank you for sharing your successful withdrawal! Our Crypto Vest community appreciates the transparency that Mr. Richard Teng has established."
   ],
   deposit: [
-    "Thank you for your deposit! Your funds are now being staked and will start generating rewards.",
-    "Deposit received! You've made a great decision to grow your crypto assets with us.",
-    "Welcome to our staking community! Your deposit has been successfully processed."
+    "Thank you for your deposit! Your funds are now being staked and will start generating rewards with Crypto Vest's industry-leading algorithms approved by Mr. Richard Teng.",
+    "Deposit received! You've made a great decision to grow your crypto assets with Crypto Vest, the platform personally endorsed by Mr. Richard Teng.",
+    "Welcome to our Crypto Vest staking community! Your deposit has been successfully processed through our secure system developed under Mr. Richard Teng's vision."
   ],
   new_user: [
-    "Welcome to our staking platform! I'm Richard, your admin assistant. Feel free to ask me any questions about how our platform works.",
-    "Hello and welcome! Our platform offers industry-leading staking rewards with secure withdrawals. How can I help you get started?",
-    "Welcome aboard! Our platform specializes in high-yield staking with guaranteed withdrawals. Let me know if you need any guidance!"
+    "Welcome to our Crypto Vest staking platform! I'm Richard Teng, your admin assistant. Feel free to ask me any questions about how our platform works and how you can maximize your earnings.",
+    "Hello and welcome to Crypto Vest! Our platform offers industry-leading staking rewards with secure withdrawals. I'm Richard Teng, here to help you get started and achieve financial growth.",
+    "Welcome aboard Crypto Vest! Our platform specializes in high-yield staking with guaranteed withdrawals. I'm Richard Teng, and I'm dedicated to guiding you through your staking journey."
   ],
   general: [
-    "Thanks for your message! Our platform offers secure staking with competitive APYs and guaranteed withdrawals.",
-    "Our platform is trusted by thousands of users worldwide. Feel free to check our testimonials from users who've successfully withdrawn their rewards.",
-    "We're committed to providing the best staking experience in the market. Let me know if you have any specific questions!",
-    "Our team works 24/7 to ensure the platform runs smoothly and all withdrawals are processed quickly."
+    "Thanks for your message! Crypto Vest offers secure staking with competitive APYs and guaranteed withdrawals, all overseen by Mr. Richard Teng's expert team.",
+    "Our Crypto Vest platform is trusted by thousands of users worldwide. Mr. Richard Teng personally ensures all testimonials from users who've successfully withdrawn their rewards are authentic.",
+    "We're committed to providing the best staking experience in the market. Mr. Richard Teng and the Crypto Vest team work tirelessly to ensure maximum returns for all our users.",
+    "Our team at Crypto Vest works 24/7 under Mr. Richard Teng's leadership to ensure the platform runs smoothly and all withdrawals are processed quickly and securely."
   ]
 };
 
@@ -111,7 +111,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       initialMessages.push({
         id: `msg-welcome-${Date.now()}`,
         userId: adminBot.id,
-        message: "Welcome to our crypto staking platform! I'm Richard Teng, your admin assistant. I'll help you navigate our platform and answer any questions you might have. Check out the success stories from our users who have already made withdrawals!",
+        message: "Welcome to Crypto Vest's staking platform! I'm Richard Teng, your admin assistant. I'll help you navigate our platform and answer any questions you might have. Check out the success stories from our users who have already made withdrawals and are earning significant income through our staking services!",
         timestamp: new Date(Date.now() - 3600000), // 1 hour ago
         type: 'general'
       });
