@@ -26,12 +26,15 @@ const Auth: React.FC = () => {
   const queryParams = new URLSearchParams(location.search);
   const referralCode = queryParams.get('ref');
   
+  // Get the redirect path from location state or default to wallet
+  const from = location.state?.from || '/wallet';
+  
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate('/wallet');
+      navigate(from, { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, from]);
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

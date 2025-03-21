@@ -23,6 +23,7 @@ import WalletAddress from "./pages/WalletAddress";
 import Referral from "./pages/Referral";
 import Auth from "./pages/Auth";
 import AiAssistant from "./components/AiAssistant";
+import AuthGuard from "./components/AuthGuard";
 
 const queryClient = new QueryClient();
 
@@ -37,20 +38,26 @@ const App = () => (
               <Sonner />
               <BrowserRouter>
                 <Routes>
+                  {/* Public Routes - accessible without authentication */}
                   <Route path="/" element={<LandingPage />} />
-                  <Route path="/wallet" element={<Wallet />} />
                   <Route path="/market" element={<Market />} />
-                  <Route path="/analytics" element={<Analytics />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/wallet-connect" element={<WalletConnect />} />
-                  <Route path="/exchange" element={<Exchange />} />
-                  <Route path="/deposit" element={<Deposit />} />
                   <Route path="/chat" element={<Chat />} />
-                  <Route path="/winners" element={<Winners />} />
-                  <Route path="/wallet-address" element={<WalletAddress />} />
                   <Route path="/referral" element={<Referral />} />
                   <Route path="/auth" element={<Auth />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  
+                  {/* Protected Routes - require authentication */}
+                  <Route element={<AuthGuard />}>
+                    <Route path="/wallet" element={<Wallet />} />
+                    <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/wallet-connect" element={<WalletConnect />} />
+                    <Route path="/exchange" element={<Exchange />} />
+                    <Route path="/deposit" element={<Deposit />} />
+                    <Route path="/winners" element={<Winners />} />
+                    <Route path="/wallet-address" element={<WalletAddress />} />
+                  </Route>
+
+                  {/* Catch-all route */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 {/* AI Assistant is globally available */}
