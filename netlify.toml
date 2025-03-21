@@ -1,0 +1,21 @@
+
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "https://cryptovest-staking.netlify.app/*"
+  to = "https://cryptovest-staking.netlify.app/:splat"
+  status = 301
+  force = true
+
+[context.production.environment]
+  VITE_SITE_URL = "https://cryptovest-staking.netlify.app"
