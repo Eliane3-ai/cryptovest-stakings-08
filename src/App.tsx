@@ -24,8 +24,16 @@ import Referral from "./pages/Referral";
 import Auth from "./pages/Auth";
 import Contact from "./pages/Contact";
 import AuthGuard from "./components/AuthGuard";
+import Diagnostics from "./pages/Diagnostics";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -45,6 +53,7 @@ const App = () => (
                   <Route path="/referral" element={<Referral />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/contact" element={<Contact />} />
+                  <Route path="/diagnostics" element={<Diagnostics />} />
                   
                   {/* Protected Routes - require authentication */}
                   <Route element={<AuthGuard />}>
