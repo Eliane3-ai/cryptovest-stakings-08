@@ -225,8 +225,8 @@ const LandingPage: React.FC = () => {
             </Button>
             
             <Button variant="outline" className="border-white text-white hover:bg-white/10 py-6 px-8 text-lg">
-              <Link to="/wallet" className="flex items-center gap-2">
-                Explore Platform <ChevronRight className="h-5 w-5" />
+              <Link to="/market" className="flex items-center gap-2">
+                Explore Market <ChevronRight className="h-5 w-5" />
               </Link>
             </Button>
           </div>
@@ -246,7 +246,7 @@ const LandingPage: React.FC = () => {
             
             <div className="flex flex-wrap gap-8">
               <Link to="/auth" className="text-gray-400 hover:text-white">Sign Up</Link>
-              <Link to="/wallet" className="text-gray-400 hover:text-white">Wallet</Link>
+              <Link to="/market" className="text-gray-400 hover:text-white">Market</Link>
               <Link to="/referral" className="text-gray-400 hover:text-white">Referral</Link>
               <Link to="/chat" className="text-gray-400 hover:text-white">Live Chat</Link>
             </div>
