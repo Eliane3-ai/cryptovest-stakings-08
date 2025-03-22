@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { cn } from "@/lib/utils";
 import { Wallet, ChevronDown, AlertTriangle, Eye, EyeOff } from "lucide-react";
@@ -115,11 +116,11 @@ const WalletHeader: React.FC<WalletHeaderProps> = ({ totalBalance, className }) 
       
       <div className="mt-4">
         <p className="text-sm font-medium text-muted-foreground mb-1">{translations.totalBalance[language]}</p>
-        <div className="bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-100 dark:border-amber-800/30">
+        <div className="bg-[#F0B90B] p-3 rounded-lg border border-[#F0B90B]/20">
           {balanceVisible ? (
-            <h1 className="text-4xl font-bold tracking-tight">${totalBalance.toLocaleString()}</h1>
+            <h1 className="text-4xl font-bold tracking-tight text-black">${totalBalance.toLocaleString()}</h1>
           ) : (
-            <h1 className="text-4xl font-bold tracking-tight">••••••</h1>
+            <h1 className="text-4xl font-bold tracking-tight text-black">••••••</h1>
           )}
         </div>
         

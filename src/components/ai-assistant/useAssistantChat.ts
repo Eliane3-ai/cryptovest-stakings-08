@@ -186,6 +186,51 @@ export const useAssistantChat = () => {
 const generateResponse = (userInput: string, currentPath: string, currentLanguage: string): Message => {
   const input = userInput.toLowerCase();
   
+  // Platform explanations
+  if (input.includes('what is this platform') || 
+      input.includes('how does this platform work') || 
+      input.includes('explain more about this platform') ||
+      input.includes('what is crypto vest') ||
+      input.includes('tell me about this platform')) {
+    return {
+      id: Date.now().toString(),
+      content: "This is Crypto Vest staking platform that is used by users both beginners and experts to generate passive income adequately by utilizing the Staking method or protocol. Would you like me to explain more about: \n\n A) Platform services \n\n B) Staking cryptocurrency",
+      sender: 'bot',
+      timestamp: new Date(),
+      options: [
+        { text: 'Platform services', value: 'A' },
+        { text: 'Staking cryptocurrency', value: 'B' }
+      ]
+    };
+  }
+  
+  // Option A - Platform services
+  if (input === 'a' || input.includes('platform services') || input.includes('option a')) {
+    return {
+      id: Date.now().toString(),
+      content: "This platform is used on daily basis by individuals around the world to enter stakes and make profits at the end of each day. We provide our first time users with certain amounts to carry out stakes (hold) until the said time expires. Then if properly managed, users automatically get credited with the amount or balance. Blockchain terms and conditions apply, and if met by users, then luck will smile on you! 😀 😊 👍",
+      sender: 'bot',
+      timestamp: new Date(),
+      links: [
+        { text: 'Start Staking Now', url: '/wallet' }
+      ]
+    };
+  }
+  
+  // Option B - Staking explanation
+  if (input === 'b' || input.includes('staking cryptocurrency') || input.includes('option b')) {
+    return {
+      id: Date.now().toString(),
+      content: "Cryptocurrency staking is a process where you lock up your digital assets to support a blockchain network and earn rewards. When you stake your cryptocurrency, you're essentially putting it to work as part of the blockchain's consensus mechanism, helping to secure the network and verify transactions. In return for this contribution, you earn additional tokens as rewards. Unlike mining, staking requires minimal hardware and energy consumption, making it a more eco-friendly way to earn passive income in crypto. Staking periods can range from a few days to several months, with longer staking periods typically offering higher APY (Annual Percentage Yield).",
+      sender: 'bot',
+      timestamp: new Date(),
+      links: [
+        { text: 'Explore Staking Options', url: '/wallet' },
+        { text: 'View Current APYs', url: '/market' }
+      ]
+    };
+  }
+  
   // Common questions about staking
   if (input.includes('stake') || input.includes('earn') || input.includes('apy') || input.includes('return')) {
     return {

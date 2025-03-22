@@ -23,6 +23,18 @@ const AiAssistant: React.FC = () => {
     handleLinkClick
   } = useAssistantChat();
 
+  // Handle when a user selects an option button
+  const handleOptionSelect = (value: string) => {
+    setInput(value);
+    setTimeout(() => {
+      handleSendMessage();
+    }, 100);
+  };
+  
+  // Get options from the last message if it has any
+  const lastMessage = messages[messages.length - 1];
+  const options = lastMessage && lastMessage.sender === 'bot' ? lastMessage.options : undefined;
+
   return (
     <>
       {/* Chat toggle button */}
@@ -58,7 +70,8 @@ const AiAssistant: React.FC = () => {
               <CardContent className="p-0 h-[380px]">
                 <MessageList 
                   messages={messages} 
-                  handleLinkClick={handleLinkClick} 
+                  handleLinkClick={handleLinkClick}
+                  handleOptionSelect={handleOptionSelect}
                 />
               </CardContent>
               
@@ -68,6 +81,8 @@ const AiAssistant: React.FC = () => {
                   setInput={setInput} 
                   handleSendMessage={handleSendMessage} 
                   inputRef={inputRef} 
+                  options={options}
+                  onOptionSelect={handleOptionSelect}
                 />
               </CardFooter>
             </>
