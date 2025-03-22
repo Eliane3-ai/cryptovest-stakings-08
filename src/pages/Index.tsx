@@ -16,6 +16,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 const Index: React.FC = () => {
+  console.log("Index component is rendering");
+  
   const { 
     activeTab, 
     setActiveTab, 
@@ -26,8 +28,22 @@ const Index: React.FC = () => {
     setCustomInitialFunding 
   } = useWalletData();
   
+  console.log("useWalletData hook returned:", { 
+    activeTabLoaded: !!activeTab, 
+    transactionsCount: transactions?.length, 
+    tokensCount: tokens?.length,
+    totalBalance 
+  });
+  
   const { chatOpen } = useChatContext();
   const { user, profile, isFirstLogin, fundUserWallet } = useAuth();
+  
+  console.log("Auth context values:", { 
+    userExists: !!user, 
+    profileExists: !!profile, 
+    isFirstLogin 
+  });
+  
   const { toast } = useToast();
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
@@ -36,11 +52,15 @@ const Index: React.FC = () => {
 
   // Check if we need to fund the user on first login
   useEffect(() => {
+    console.log("First login effect running", { isFirstLogin, user, profile, isFundingComplete });
+    
     if (isFirstLogin && user && profile && !isFundingComplete) {
+      console.log("Attempting to fund user wallet");
       const stakingKnowledge = profile.staking_knowledge || 'beginner';
       
       // Fund the user's wallet
       fundUserWallet(user.id, stakingKnowledge).then((fundAmount) => {
+        console.log("Funding completed with amount:", fundAmount);
         if (fundAmount > 0) {
           // Update wallet with initial tokens
           setCustomInitialFunding(fundAmount);
@@ -54,9 +74,13 @@ const Index: React.FC = () => {
           
           setIsFundingComplete(true);
         }
+      }).catch(error => {
+        console.error("Error funding wallet:", error);
       });
     }
   }, [isFirstLogin, user, profile, fundUserWallet, toast, setCustomInitialFunding, isFundingComplete]);
+
+  console.log("Index component rendering UI");
 
   return (
     <div className="min-h-screen bg-[#0B0E11] text-white">

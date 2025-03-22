@@ -23,7 +23,6 @@ import WalletAddress from "./pages/WalletAddress";
 import Referral from "./pages/Referral";
 import Auth from "./pages/Auth";
 import Contact from "./pages/Contact";
-import AiAssistant from "./components/AiAssistant";
 import AuthGuard from "./components/AuthGuard";
 
 const queryClient = new QueryClient();
@@ -62,8 +61,7 @@ const App = () => (
                   {/* Catch-all route */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-                {/* AI Assistant is globally available */}
-                <AiAssistant />
+                {/* AiAssistant has been removed from here */}
               </BrowserRouter>
             </TooltipProvider>
           </ChatProvider>
