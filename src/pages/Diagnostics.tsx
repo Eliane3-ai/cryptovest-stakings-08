@@ -7,6 +7,18 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWalletData } from '@/hooks/useWalletData';
 
+// Define a custom interface for the performance.memory object
+interface MemoryInfo {
+  usedJSHeapSize: number;
+  jsHeapSizeLimit: number;
+  totalJSHeapSize?: number;
+}
+
+// Extend the Performance interface
+interface ExtendedPerformance extends Performance {
+  memory?: MemoryInfo;
+}
+
 const Diagnostics: React.FC = () => {
   const [logs, setLogs] = useState<string[]>([]);
   const [systemInfo, setSystemInfo] = useState<Record<string, any>>({});
@@ -91,9 +103,11 @@ const Diagnostics: React.FC = () => {
   
   const runMemoryTest = () => {
     addLog('Running memory usage test...');
-    if (performance && 'memory' in performance) {
-      // @ts-ignore - memory is not in the standard Performance interface
-      const memory = performance.memory;
+    // Type assertion for performance object
+    const extendedPerformance = performance as ExtendedPerformance;
+    
+    if (extendedPerformance && extendedPerformance.memory) {
+      const memory = extendedPerformance.memory;
       addLog(`Memory usage: ${Math.round(memory.usedJSHeapSize / 1024 / 1024)}MB / ${Math.round(memory.jsHeapSizeLimit / 1024 / 1024)}MB`);
     } else {
       addLog('Memory API not available in this browser');
