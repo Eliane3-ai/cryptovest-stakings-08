@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Mail, Lock, User, MapPin, Phone } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -31,7 +30,6 @@ interface SignupFormProps {
   setIsButtonPressed: (pressed: boolean) => void;
 }
 
-// List of countries for the dropdown
 const countries = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", 
   "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", 
@@ -78,7 +76,6 @@ const SignupForm: React.FC<SignupFormProps> = ({
   isButtonPressed,
   setIsButtonPressed
 }) => {
-  // Button interactive style
   const buttonStyle = isButtonPressed 
     ? "w-full bg-yellow-400 hover:bg-yellow-500 text-black transform scale-95 transition-all duration-200" 
     : "w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black transition-all duration-200";
@@ -208,7 +205,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
           </div>
         )}
 
-        <Alert variant="info" className="bg-[#263240] border-[#3E4C5C]">
+        <Alert className="bg-[#263240] border-[#3E4C5C]">
           <CheckCircle className="h-4 w-4 text-[#F0B90B]" />
           <AlertTitle className="text-white">Email Verification Required</AlertTitle>
           <AlertDescription className="text-gray-300">

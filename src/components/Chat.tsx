@@ -37,11 +37,21 @@ const Chat: React.FC<ChatProps> = ({ className = '' }) => {
     setReplyingTo(messageId);
   };
 
+  // Reset notification when chat is opened
+  React.useEffect(() => {
+    if (chatOpen && notification.count > 0) {
+      resetNotification();
+    }
+  }, [chatOpen, notification.count, resetNotification]);
+
   return (
     <>
       {/* Floating notification badge */}
       {notification.count > 0 && !chatOpen && (
-        <div className="fixed top-4 right-4 z-50 animate-bounce">
+        <div 
+          className="fixed top-4 right-4 z-50 animate-bounce cursor-pointer" 
+          onClick={() => setChatOpen(true)}
+        >
           <Badge variant="outline" className="bg-[#F0B90B] text-black px-3 py-2 flex items-center gap-1">
             <BellDot className="h-4 w-4" />
             {notification.count} new messages

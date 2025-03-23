@@ -56,6 +56,7 @@ const ChatForm: React.FC<ChatFormProps> = ({
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type your question..."
           className="flex-1 bg-[#2B3139] border-[#474D57]"
+          disabled={false}
         />
         <Button 
           type="submit" 
