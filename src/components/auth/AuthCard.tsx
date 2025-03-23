@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
+import TwoFactorForm from './TwoFactorForm';
 
 interface AuthCardProps {
   activeTab: string;
@@ -27,6 +28,10 @@ interface AuthCardProps {
   handleLogin: (e: React.FormEvent) => Promise<void>;
   handleSignup: (e: React.FormEvent) => Promise<void>;
   handleResendVerification: () => Promise<void>;
+  handle2FAVerify?: (code: string) => Promise<void>;
+  showTwoFactor?: boolean;
+  twoFactorError?: string | null;
+  cancelTwoFactor?: () => void;
   referralCode: string | null;
   isButtonPressed: boolean;
   setIsButtonPressed: (pressed: boolean) => void;
@@ -54,10 +59,30 @@ const AuthCard: React.FC<AuthCardProps> = ({
   handleLogin,
   handleSignup,
   handleResendVerification,
+  handle2FAVerify,
+  showTwoFactor,
+  twoFactorError,
+  cancelTwoFactor,
   referralCode,
   isButtonPressed,
   setIsButtonPressed
 }) => {
+  // Handle 2FA verification scenario
+  if (showTwoFactor && handle2FAVerify && cancelTwoFactor) {
+    return (
+      <Card className="border-[#474D57] bg-[#1E2026]">
+        <TwoFactorForm
+          verifying={loading}
+          onVerify={handle2FAVerify}
+          onCancel={cancelTwoFactor}
+          error={twoFactorError || null}
+          isButtonPressed={isButtonPressed}
+          setIsButtonPressed={setIsButtonPressed}
+        />
+      </Card>
+    );
+  }
+
   return (
     <Card className="border-[#474D57] bg-[#1E2026]">
       <CardHeader>

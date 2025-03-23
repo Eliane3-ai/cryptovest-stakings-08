@@ -20,6 +20,7 @@ export interface AuthContextType {
   isLoading: boolean;
   isFirstLogin: boolean;
   isEmailVerified: boolean | null;
+  isTwoFactorEnabled: boolean;
   signUp: (email: string, password: string, userData?: {
     username?: string;
     full_name?: string;
@@ -32,6 +33,9 @@ export interface AuthContextType {
   getProfile: (id: string) => Promise<UserProfile | null>;
   resendVerificationEmail: (email: string) => Promise<{ error: Error | null, data?: any }>;
   verify2FA: (code: string) => Promise<{ error: Error | null, success: boolean }>;
+  setup2FA: () => Promise<{ error: Error | null, secret?: string, qrCodeUrl?: string }>;
+  verify2FASetup: (code: string) => Promise<{ error: Error | null, success: boolean }>;
+  disable2FA: () => Promise<{ error: Error | null, success: boolean }>;
 }
 
 export interface AuthProviderProps {

@@ -1,139 +1,69 @@
 
-import React, { useEffect, useState } from 'react';
-import AppHeader from "@/components/AppHeader";
-import WalletHeader from "@/components/WalletHeader";
-import TabsSection from "@/components/TabsSection";
-import AssetsList from "@/components/AssetsList";
-import TransactionsList from "@/components/TransactionsList";
-import StakingSection from "@/components/StakingSection";
-import LiveMarketView from "@/components/LiveMarketView";
-import { useWalletData } from "@/hooks/useWalletData";
-import { useChatContext } from "@/contexts/ChatContext";
-import WithdrawDialog from "@/components/dialogs/WithdrawDialog";
-import DepositDialog from "@/components/dialogs/DepositDialog";
-import GasFeeTopUpDialog from "@/components/dialogs/GasFeeTopUpDialog";
-import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Shield, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import HeroSection from '@/components/landing/HeroSection';
+import FeaturesSection from '@/components/landing/FeaturesSection';
+import TestimonialsSection from '@/components/landing/TestimonialsSection';
+import CtaSection from '@/components/landing/CtaSection';
+import FooterSection from '@/components/landing/FooterSection';
 
 const Index: React.FC = () => {
-  console.log("Index component is rendering");
-  
-  const { 
-    activeTab, 
-    setActiveTab, 
-    transactions, 
-    tokens, 
-    totalBalance,
-    stakingOptions,
-    setCustomInitialFunding 
-  } = useWalletData();
-  
-  console.log("useWalletData hook returned:", { 
-    activeTabLoaded: !!activeTab, 
-    transactionsCount: transactions?.length, 
-    tokensCount: tokens?.length,
-    totalBalance 
-  });
-  
-  const { chatOpen } = useChatContext();
-  const { user, profile, isFirstLogin, fundUserWallet } = useAuth();
-  
-  console.log("Auth context values:", { 
-    userExists: !!user, 
-    profileExists: !!profile, 
-    isFirstLogin 
-  });
-  
-  const { toast } = useToast();
-  const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
-  const [depositDialogOpen, setDepositDialogOpen] = useState(false);
-  const [topUpDialogOpen, setTopUpDialogOpen] = useState(false);
-  const [isFundingComplete, setIsFundingComplete] = useState(false);
+  const { user, isLoading } = useAuth();
+  const navigate = useNavigate();
 
-  // Check if we need to fund the user on first login
   useEffect(() => {
-    console.log("First login effect running", { isFirstLogin, user, profile, isFundingComplete });
-    
-    if (isFirstLogin && user && profile && !isFundingComplete) {
-      console.log("Attempting to fund user wallet");
-      const stakingKnowledge = profile.staking_knowledge || 'beginner';
-      
-      // Fund the user's wallet
-      fundUserWallet(user.id, stakingKnowledge).then((fundAmount) => {
-        console.log("Funding completed with amount:", fundAmount);
-        if (fundAmount > 0) {
-          // Update wallet with initial tokens
-          setCustomInitialFunding(fundAmount);
-          
-          // Show welcome message with funding details
-          toast({
-            title: "Welcome to Crypto Vest! 🎉",
-            description: `Your wallet has been funded with $${fundAmount.toLocaleString()} worth of cryptocurrency to start your journey!`,
-            duration: 10000, // Show for 10 seconds
-          });
-          
-          setIsFundingComplete(true);
-        }
-      }).catch(error => {
-        console.error("Error funding wallet:", error);
-      });
+    if (user) {
+      navigate('/wallet');
     }
-  }, [isFirstLogin, user, profile, fundUserWallet, toast, setCustomInitialFunding, isFundingComplete]);
+  }, [user, navigate]);
 
-  console.log("Index component rendering UI");
+  const handleGetStarted = () => {
+    if (user) {
+      navigate('/wallet');
+    } else {
+      navigate('/auth');
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#0B0E11] text-white">
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        {/* Top App Bar with Menu */}
-        <AppHeader />
-          
-        {/* Main Content */}
-        <div>
-          {/* Wallet Header with actions integrated */}
-          <WalletHeader totalBalance={totalBalance} />
-          
-          {/* Live Market View */}
-          <LiveMarketView />
-          
-          {/* Tab Navigation */}
-          <TabsSection activeTab={activeTab} setActiveTab={setActiveTab} />
-          
-          {/* Content based on active tab */}
-          {activeTab === 'assets' && <AssetsList tokens={tokens} />}
-          {activeTab === 'transactions' && <TransactionsList transactions={transactions} />}
-          {activeTab === 'staking' && <StakingSection stakingOptions={stakingOptions} />}
+    <div className="min-h-screen bg-background">
+      <nav className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex h-16 items-center px-4 max-w-7xl mx-auto">
+          <div className="flex items-center gap-2">
+            <Shield className="h-6 w-6 text-primary" />
+            <span className="text-xl font-bold">Crypto Vest</span>
+          </div>
+          <div className="ml-auto flex gap-4">
+            {user ? (
+              <Button variant="default" onClick={() => navigate('/wallet')}>
+                My Wallet
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+            ) : (
+              <>
+                <Button variant="ghost" onClick={() => navigate('/auth')}>
+                  Sign In
+                </Button>
+                <Button onClick={() => navigate('/auth?tab=signup')}>
+                  Create Account
+                </Button>
+              </>
+            )}
+          </div>
         </div>
+      </nav>
 
-        {/* Hidden button triggers for dialogs */}
-        <button 
-          id="withdraw-dialog-trigger" 
-          className="hidden"
-          onClick={() => setWithdrawDialogOpen(true)}
-        />
-        <button 
-          id="deposit-dialog-trigger" 
-          className="hidden"
-          onClick={() => setDepositDialogOpen(true)}
-        />
-        
-        {/* Dialogs */}
-        <WithdrawDialog 
-          open={withdrawDialogOpen} 
-          onOpenChange={setWithdrawDialogOpen}
-          onShowTopUp={() => setTopUpDialogOpen(true)}
-        />
-        
-        <DepositDialog 
-          open={depositDialogOpen} 
-          onOpenChange={setDepositDialogOpen} 
-        />
-        
-        <GasFeeTopUpDialog 
-          open={topUpDialogOpen} 
-          onOpenChange={setTopUpDialogOpen} 
-        />
-      </div>
+      <main>
+        <HeroSection handleGetStarted={handleGetStarted} />
+        <FeaturesSection />
+        <TestimonialsSection />
+        <CtaSection />
+      </main>
+
+      <FooterSection />
     </div>
   );
 };

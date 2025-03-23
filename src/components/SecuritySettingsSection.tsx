@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getTranslation } from '@/utils/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,7 +13,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 
 const SecuritySettingsSection: React.FC = () => {
   const { language } = useLanguage();
-  const { user } = useAuth();
+  const { user, isTwoFactorEnabled, setup2FA, verify2FASetup, disable2FA } = useAuth();
   const { toast } = useToast();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -27,6 +27,11 @@ const SecuritySettingsSection: React.FC = () => {
   const [twoFAQRCode, setTwoFAQRCode] = useState('');
   const [twoFASecret, setTwoFASecret] = useState('');
   const [twoFAVerifying, setTwoFAVerifying] = useState(false);
+
+  // Initialize 2FA state from the user context
+  useEffect(() => {
+    setTwoFAEnabled(isTwoFactorEnabled || false);
+  }, [isTwoFactorEnabled]);
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,44 +58,46 @@ const SecuritySettingsSection: React.FC = () => {
     setConfirmNewPassword('');
   };
 
-  const handle2FAEnable = () => {
-    // In a real implementation, we would generate a QR code and secret key here
-    // For this demo, we'll simulate the process
-    setTwoFASecret('ABCDEFGHIJKLMNOP'); // This would be a real secret in production
-    setTwoFAQRCode('/placeholder.svg'); // This would be a real QR code in production
-    setTwoFAOpen(true);
+  const handle2FAEnable = async () => {
+    const result = await setup2FA();
+    
+    if (result.error) {
+      toast({
+        title: "Setup Failed",
+        description: result.error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (result.secret && result.qrCodeUrl) {
+      setTwoFASecret(result.secret);
+      setTwoFAQRCode(result.qrCodeUrl);
+      setTwoFAOpen(true);
+    }
   };
 
-  const handle2FAVerify = () => {
+  const handle2FAVerify = async () => {
     setTwoFAVerifying(true);
     
-    // In a real implementation, we would verify the code against the secret
-    // For this demo, we'll accept any 6-digit code
-    setTimeout(() => {
-      if (twoFACode.length === 6) {
+    try {
+      const result = await verify2FASetup(twoFACode);
+      
+      if (result.success) {
         setTwoFAEnabled(true);
         setTwoFAOpen(false);
-        toast({
-          title: "2FA Enabled",
-          description: "Two-factor authentication has been successfully enabled for your account",
-        });
-      } else {
-        toast({
-          title: "Invalid Code",
-          description: "Please enter a valid 6-digit code",
-          variant: "destructive",
-        });
       }
+    } finally {
       setTwoFAVerifying(false);
-    }, 1500);
+    }
   };
 
-  const handle2FADisable = () => {
-    setTwoFAEnabled(false);
-    toast({
-      title: "2FA Disabled",
-      description: "Two-factor authentication has been disabled for your account",
-    });
+  const handle2FADisable = async () => {
+    const result = await disable2FA();
+    
+    if (result.success) {
+      setTwoFAEnabled(false);
+    }
   };
 
   const handleAPIKeys = () => {

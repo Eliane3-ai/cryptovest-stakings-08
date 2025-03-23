@@ -14,7 +14,7 @@ const Auth: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { user, signIn, signUp, isEmailVerified, resendVerificationEmail } = useAuth();
+  const { user, signIn, signUp, isEmailVerified, resendVerificationEmail, verify2FA, isTwoFactorEnabled } = useAuth();
   
   // Form state
   const [email, setEmail] = useState('');
@@ -31,6 +31,10 @@ const Auth: React.FC = () => {
   const [activeTab, setActiveTab] = useState('login');
   const [isButtonPressed, setIsButtonPressed] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
+  
+  // 2FA States
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
+  const [twoFactorError, setTwoFactorError] = useState<string | null>(null);
   
   // Get referral code from URL if present
   const queryParams = new URLSearchParams(location.search);
@@ -65,9 +69,10 @@ const Auth: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setTwoFactorError(null);
     
     try {
-      const { error } = await signIn(email, password);
+      const { error, data } = await signIn(email, password);
       
       if (error) {
         toast({
@@ -75,6 +80,13 @@ const Auth: React.FC = () => {
           description: error.message,
           variant: "destructive"
         });
+        return;
+      }
+      
+      // Check if 2FA is enabled for this user
+      if (data?.user?.user_metadata?.two_factor_enabled === true) {
+        // Show 2FA verification form
+        setShowTwoFactor(true);
         return;
       }
       
@@ -149,6 +161,39 @@ const Auth: React.FC = () => {
     }
   };
   
+  const handle2FAVerify = async (code: string) => {
+    setLoading(true);
+    setTwoFactorError(null);
+    
+    try {
+      const { error, success } = await verify2FA(code);
+      
+      if (error || !success) {
+        setTwoFactorError(error?.message || "Invalid verification code");
+        return;
+      }
+      
+      // Successful verification - already logged in at this point
+      toast({
+        title: "Login Successful",
+        description: "Welcome back to Crypto Vest!",
+      });
+      
+      // Redirect to the dashboard or requested page
+      navigate(from, { replace: true });
+    } catch (error) {
+      console.error('2FA verification error:', error);
+      setTwoFactorError("An error occurred during verification");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const cancelTwoFactor = () => {
+    setShowTwoFactor(false);
+    setTwoFactorError(null);
+  };
+  
   return (
     <div className="min-h-screen bg-[#0B0E11] flex items-center justify-center p-4">
       <div className="max-w-md w-full">
@@ -197,6 +242,10 @@ const Auth: React.FC = () => {
             handleLogin={handleLogin}
             handleSignup={handleSignup}
             handleResendVerification={handleResendVerification}
+            handle2FAVerify={handle2FAVerify}
+            showTwoFactor={showTwoFactor}
+            twoFactorError={twoFactorError}
+            cancelTwoFactor={cancelTwoFactor}
             referralCode={referralCode}
             isButtonPressed={isButtonPressed}
             setIsButtonPressed={setIsButtonPressed}
