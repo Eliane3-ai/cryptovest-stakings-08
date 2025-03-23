@@ -10,8 +10,8 @@ export interface UserProfile {
   avatar_url: string | null;
   created_at: string;
   updated_at: string;
-  staking_knowledge?: StakingKnowledgeLevel;
-  is_funded?: boolean;
+  mobile_number?: string | null;
+  country?: string | null;
 }
 
 export interface AuthContextType {
@@ -24,12 +24,12 @@ export interface AuthContextType {
     username?: string;
     full_name?: string;
     referral_code?: string;
-    staking_knowledge?: StakingKnowledgeLevel;
+    mobile_number?: string;
+    country?: string;
   }) => Promise<{ error: Error | null, data?: any }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null, data?: any }>;
   signOut: () => Promise<void>;
   getProfile: (id: string) => Promise<UserProfile | null>;
-  fundUserWallet: (userId: string, knowledgeLevel: StakingKnowledgeLevel) => Promise<number>;
   resendVerificationEmail: (email: string) => Promise<{ error: Error | null, data?: any }>;
 }
 

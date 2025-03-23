@@ -16,8 +16,6 @@ export function useAuthState() {
 
   // Initialize auth state
   useEffect(() => {
-    console.log("Initializing auth state...");
-    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -32,6 +30,9 @@ export function useAuthState() {
           setProfile(null);
           setIsEmailVerified(null);
         }
+
+        // Set loading to false after auth state change is processed
+        setIsLoading(false);
       }
     );
     
@@ -43,10 +44,10 @@ export function useAuthState() {
       
       if (session?.user) {
         setIsEmailVerified(session.user.email_confirmed_at !== null);
-        setIsLoading(false);
-      } else {
-        setIsLoading(false);
       }
+      
+      // Set loading to false after initial session check
+      setIsLoading(false);
     });
     
     return () => {

@@ -5,7 +5,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { StakingKnowledgeLevel } from '@/types/auth';
 
 // Import refactored components
 import AuthCard from '@/components/auth/AuthCard';
@@ -22,7 +21,9 @@ const Auth: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [stakingKnowledge, setStakingKnowledge] = useState<StakingKnowledgeLevel>('beginner');
+  const [fullName, setFullName] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [country, setCountry] = useState('');
   
   // UI state
   const [loading, setLoading] = useState(false);
@@ -108,8 +109,9 @@ const Auth: React.FC = () => {
     try {
       const userData = {
         username,
-        full_name: username, // Using username as full_name for now
-        staking_knowledge: stakingKnowledge,
+        full_name: fullName,
+        mobile_number: mobileNumber,
+        country: country,
         ...(referralCode && { referral_code: referralCode })
       };
       
@@ -182,10 +184,14 @@ const Auth: React.FC = () => {
             setPassword={setPassword}
             username={username}
             setUsername={setUsername}
+            fullName={fullName}
+            setFullName={setFullName}
+            mobileNumber={mobileNumber}
+            setMobileNumber={setMobileNumber}
+            country={country}
+            setCountry={setCountry}
             confirmPassword={confirmPassword}
             setConfirmPassword={setConfirmPassword}
-            stakingKnowledge={stakingKnowledge}
-            setStakingKnowledge={setStakingKnowledge}
             loading={loading}
             isEmailVerified={isEmailVerified}
             handleLogin={handleLogin}

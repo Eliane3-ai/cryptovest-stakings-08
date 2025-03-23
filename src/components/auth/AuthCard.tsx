@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
-import { StakingKnowledgeLevel } from '@/types/auth';
 
 interface AuthCardProps {
   activeTab: string;
@@ -15,10 +14,14 @@ interface AuthCardProps {
   setPassword: (password: string) => void;
   username: string;
   setUsername: (username: string) => void;
+  fullName: string;
+  setFullName: (fullName: string) => void;
+  mobileNumber: string;
+  setMobileNumber: (mobileNumber: string) => void;
+  country: string;
+  setCountry: (country: string) => void;
   confirmPassword: string;
   setConfirmPassword: (confirmPassword: string) => void;
-  stakingKnowledge: StakingKnowledgeLevel;
-  setStakingKnowledge: (level: StakingKnowledgeLevel) => void;
   loading: boolean;
   isEmailVerified: boolean | null;
   handleLogin: (e: React.FormEvent) => Promise<void>;
@@ -38,10 +41,14 @@ const AuthCard: React.FC<AuthCardProps> = ({
   setPassword,
   username,
   setUsername,
+  fullName,
+  setFullName,
+  mobileNumber,
+  setMobileNumber,
+  country,
+  setCountry,
   confirmPassword,
   setConfirmPassword,
-  stakingKnowledge,
-  setStakingKnowledge,
   loading,
   isEmailVerified,
   handleLogin,
@@ -58,7 +65,7 @@ const AuthCard: React.FC<AuthCardProps> = ({
         <CardDescription className="text-gray-400">
           {activeTab === 'login' 
             ? 'Sign in to access your account' 
-            : 'Create a new account to start earning'}
+            : 'Create a new account to get started'}
         </CardDescription>
       </CardHeader>
       
@@ -90,12 +97,16 @@ const AuthCard: React.FC<AuthCardProps> = ({
             setEmail={setEmail}
             username={username}
             setUsername={setUsername}
+            fullName={fullName}
+            setFullName={setFullName}
+            mobileNumber={mobileNumber}
+            setMobileNumber={setMobileNumber}
+            country={country}
+            setCountry={setCountry}
             password={password}
             setPassword={setPassword}
             confirmPassword={confirmPassword}
             setConfirmPassword={setConfirmPassword}
-            stakingKnowledge={stakingKnowledge}
-            setStakingKnowledge={setStakingKnowledge}
             loading={loading}
             handleSignup={handleSignup}
             setActiveTab={setActiveTab}

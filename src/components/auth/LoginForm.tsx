@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Mail, Lock, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -39,7 +39,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
     : "w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black transition-all duration-200";
 
   return (
-    <form onSubmit={handleLogin}>
+    <form onSubmit={handleLogin} className="px-6 py-4">
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email" className="text-white">Email</Label>
@@ -51,7 +51,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
               placeholder="your.email@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 bg-[#2B3139] border-[#474D57]"
+              className="pl-10 bg-[#2B3139] border-[#474D57] text-white h-12"
               required
             />
           </div>
@@ -67,21 +67,21 @@ const LoginForm: React.FC<LoginFormProps> = ({
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 bg-[#2B3139] border-[#474D57]"
+              className="pl-10 bg-[#2B3139] border-[#474D57] text-white h-12"
               required
             />
           </div>
         </div>
 
         {isEmailVerified === false && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="bg-red-900/30 border-red-800 text-white">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Email Not Verified</AlertTitle>
-            <AlertDescription>
-              Please verify your email before logging in. 
+            <AlertDescription className="flex flex-col gap-2">
+              <span>Please verify your email before logging in.</span> 
               <Button 
-                variant="link" 
-                className="p-0 h-auto text-white underline" 
+                variant="outline" 
+                className="p-0 h-auto text-white underline border-none hover:bg-transparent hover:text-[#F0B90B]" 
                 onClick={handleResendVerification}
               >
                 Resend verification email

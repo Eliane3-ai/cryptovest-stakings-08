@@ -1,6 +1,5 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { StakingKnowledgeLevel } from '@/types/auth';
 import { useToast } from '@/hooks/use-toast';
 
 export function useAuthMethods() {
@@ -10,7 +9,8 @@ export function useAuthMethods() {
     username?: string;
     full_name?: string;
     referral_code?: string;
-    staking_knowledge?: StakingKnowledgeLevel;
+    mobile_number?: string;
+    country?: string;
   }) => {
     try {
       console.log("Signing up user:", email);
@@ -62,6 +62,10 @@ export function useAuthMethods() {
         return { error };
       } else {
         console.log("Login successful:", data);
+        toast({
+          title: "Login Successful",
+          description: "Welcome back to Crypto Vest!",
+        });
         return { error: null, data };
       }
     } catch (error) {
@@ -106,47 +110,13 @@ export function useAuthMethods() {
   const signOut = async () => {
     console.log("Signing out user");
     await supabase.auth.signOut();
-  };
-
-  const fundUserWallet = async (userId: string, knowledgeLevel: StakingKnowledgeLevel) => {
-    try {
-      console.log("Funding user wallet:", userId, knowledgeLevel);
-      // Mark user as funded in the database
-      await supabase
-        .from('profiles')
-        .update({ 
-          is_funded: true,
-          staking_knowledge: knowledgeLevel
-        })
-        .eq('id', userId);
-      
-      // Return the funding amount based on knowledge level
-      let fundingAmount = 15790;
-      switch (knowledgeLevel) {
-        case 'beginner':
-          fundingAmount = 15790;
-          break;
-        case 'intermediate':
-          fundingAmount = 75670;
-          break;
-        case 'expert':
-          fundingAmount = 350900;
-          break;
-      }
-      
-      console.log("User funded with amount:", fundingAmount);
-      return fundingAmount;
-    } catch (error) {
-      console.error('Error funding user:', error);
-      return 0;
-    }
+    window.location.href = '/';
   };
 
   return {
     signUp,
     signIn,
     signOut,
-    resendVerificationEmail,
-    fundUserWallet
+    resendVerificationEmail
   };
 }
