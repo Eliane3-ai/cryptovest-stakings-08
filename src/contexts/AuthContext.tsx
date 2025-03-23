@@ -22,6 +22,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isFirstLogin, setIsFirstLogin] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState<boolean | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -36,6 +37,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         if (session?.user) {
           console.log("User authenticated, fetching profile...");
+          setIsEmailVerified(session.user.email_confirmed_at !== null);
+          
           const profile = await getProfile(session.user.id);
           setProfile(profile);
           
@@ -54,6 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         } else {
           setProfile(null);
           setIsFirstLogin(false);
+          setIsEmailVerified(null);
         }
       }
     );
@@ -65,6 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(session?.user ?? null);
       
       if (session?.user) {
+        setIsEmailVerified(session.user.email_confirmed_at !== null);
         getProfile(session.user.id).then(profile => {
           setProfile(profile);
           setIsLoading(false);
@@ -88,26 +93,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }) => {
     try {
       console.log("Signing up user:", email);
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: userData
+          data: userData,
+          emailRedirectTo: window.location.origin + '/auth?verified=true'
         }
       });
       
       if (error) {
         console.error("Signup error:", error);
+        return { error };
       } else {
-        console.log("Signup successful");
-        // Show toast for email verification if needed
+        console.log("Signup successful, email verification sent:", data);
+        // Show toast for email verification
         toast({
           title: "Account Created",
           description: "Please check your email to verify your account.",
         });
+        return { error: null, data };
       }
-      
-      return { error };
     } catch (error) {
       console.error("Signup exception:", error);
       return { error: error as Error };
@@ -117,20 +123,68 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signIn = async (email: string, password: string) => {
     try {
       console.log("Signing in user:", email);
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password
       });
       
       if (error) {
         console.error("Login error:", error);
+        // Check if the error is due to email not being confirmed
+        if (error.message.includes('Email not confirmed')) {
+          toast({
+            title: "Email Not Verified",
+            description: "Please check your email and verify your account before logging in.",
+            variant: "destructive"
+          });
+        }
+        return { error };
       } else {
-        console.log("Login successful");
+        console.log("Login successful:", data);
+        // Check if email is verified
+        if (data.user && !data.user.email_confirmed_at) {
+          console.log("User email not verified");
+          setIsEmailVerified(false);
+        } else {
+          setIsEmailVerified(true);
+        }
+        return { error: null, data };
       }
-      
-      return { error };
     } catch (error) {
       console.error("Login exception:", error);
+      return { error: error as Error };
+    }
+  };
+
+  const resendVerificationEmail = async (email: string) => {
+    try {
+      console.log("Resending verification email to:", email);
+      const { error, data } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: window.location.origin + '/auth?verified=true'
+        }
+      });
+      
+      if (error) {
+        console.error("Error resending verification email:", error);
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+        return { error };
+      } else {
+        console.log("Verification email resent successfully");
+        toast({
+          title: "Email Sent",
+          description: "Verification email has been resent. Please check your inbox.",
+        });
+        return { error: null, data };
+      }
+    } catch (error) {
+      console.error("Resend verification email exception:", error);
       return { error: error as Error };
     }
   };
@@ -203,11 +257,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       profile,
       isLoading,
       isFirstLogin,
+      isEmailVerified,
       signUp,
       signIn,
       signOut,
       getProfile,
-      fundUserWallet
+      fundUserWallet,
+      resendVerificationEmail
     }}>
       {children}
     </AuthContext.Provider>

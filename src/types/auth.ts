@@ -19,16 +19,18 @@ export interface AuthContextType {
   profile: UserProfile | null;
   isLoading: boolean;
   isFirstLogin: boolean;
+  isEmailVerified: boolean | null;
   signUp: (email: string, password: string, userData?: {
     username?: string;
     full_name?: string;
     referral_code?: string;
     staking_knowledge?: StakingKnowledgeLevel;
-  }) => Promise<{ error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  }) => Promise<{ error: Error | null, data?: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null, data?: any }>;
   signOut: () => Promise<void>;
   getProfile: (id: string) => Promise<UserProfile | null>;
   fundUserWallet: (userId: string, knowledgeLevel: StakingKnowledgeLevel) => Promise<number>;
+  resendVerificationEmail: (email: string) => Promise<{ error: Error | null, data?: any }>;
 }
 
 export interface AuthProviderProps {

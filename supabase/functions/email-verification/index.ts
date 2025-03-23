@@ -46,9 +46,10 @@ serve(async (req) => {
       throw new Error(`Error storing verification code: ${storeError.message}`);
     }
 
-    // Send an email with the verification code
-    // In a real application, you would use a proper email service like SendGrid, Mailgun, etc.
-    // For this demonstration, we'll just return the code as if it was sent
+    console.log(`Verification code generated for ${email}: ${verificationCode}`);
+
+    // For a real application, here you would send an email with the verification code
+    // For this demonstration, we'll just return the code
     
     return new Response(
       JSON.stringify({ 
