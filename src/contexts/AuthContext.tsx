@@ -28,7 +28,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signUp,
     signIn,
     signOut,
-    resendVerificationEmail
+    resendVerificationEmail,
+    verify2FA
   } = useAuthMethods();
 
   return (
@@ -42,7 +43,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       signIn,
       signOut,
       getProfile,
-      resendVerificationEmail
+      resendVerificationEmail,
+      verify2FA
     }}>
       {children}
     </AuthContext.Provider>

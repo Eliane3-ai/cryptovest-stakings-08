@@ -107,6 +107,41 @@ export function useAuthMethods() {
     }
   };
 
+  const verify2FA = async (code: string) => {
+    try {
+      console.log("Verifying 2FA code:", code);
+      // In a real implementation, we would verify the 2FA code against the user's secret
+      // This is just a mock implementation for demonstration purposes
+      
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      
+      if (code.length === 6) {
+        toast({
+          title: "2FA Verified",
+          description: "Your two-factor authentication code has been verified.",
+        });
+        return { error: null, success: true };
+      } else {
+        const error = new Error("Invalid 2FA code. Please try again.");
+        toast({
+          title: "Verification Failed",
+          description: "Invalid 2FA code. Please try again.",
+          variant: "destructive"
+        });
+        return { error, success: false };
+      }
+    } catch (error) {
+      console.error("2FA verification exception:", error);
+      toast({
+        title: "Verification Error",
+        description: "An error occurred during 2FA verification.",
+        variant: "destructive"
+      });
+      return { error: error as Error, success: false };
+    }
+  };
+
   const signOut = async () => {
     console.log("Signing out user");
     await supabase.auth.signOut();
@@ -117,6 +152,7 @@ export function useAuthMethods() {
     signUp,
     signIn,
     signOut,
-    resendVerificationEmail
+    resendVerificationEmail,
+    verify2FA
   };
 }

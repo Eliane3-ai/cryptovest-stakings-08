@@ -25,6 +25,9 @@ const Settings: React.FC = () => {
 
         <h1 className="text-2xl font-bold mb-6">{getTranslation('settings', language)}</h1>
 
+        {/* Security Settings Section - Moved to top for emphasis */}
+        <SecuritySettingsSection />
+        
         {/* KYC Verification Section */}
         <KYCVerificationSection />
         
@@ -36,9 +39,6 @@ const Settings: React.FC = () => {
         
         {/* Application Settings Section */}
         <ApplicationSettingsSection />
-        
-        {/* Security Settings Section */}
-        <SecuritySettingsSection />
       </div>
     </div>
   );

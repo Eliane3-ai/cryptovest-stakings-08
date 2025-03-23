@@ -31,6 +31,7 @@ export interface AuthContextType {
   signOut: () => Promise<void>;
   getProfile: (id: string) => Promise<UserProfile | null>;
   resendVerificationEmail: (email: string) => Promise<{ error: Error | null, data?: any }>;
+  verify2FA: (code: string) => Promise<{ error: Error | null, success: boolean }>;
 }
 
 export interface AuthProviderProps {
