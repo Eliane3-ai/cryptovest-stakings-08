@@ -24,6 +24,7 @@ const Auth: React.FC = () => {
   const [stakingKnowledge, setStakingKnowledge] = useState<StakingKnowledgeLevel>('beginner');
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('login');
+  const [isButtonPressed, setIsButtonPressed] = useState(false);
   
   // Get referral code from URL if present
   const queryParams = new URLSearchParams(location.search);
@@ -65,6 +66,7 @@ const Auth: React.FC = () => {
       });
     } finally {
       setLoading(false);
+      setIsButtonPressed(false);
     }
   };
   
@@ -116,6 +118,7 @@ const Auth: React.FC = () => {
       });
     } finally {
       setLoading(false);
+      setIsButtonPressed(false);
     }
   };
 
@@ -134,6 +137,11 @@ const Auth: React.FC = () => {
       description: "Advanced knowledge of staking. Starting with $350,900 worth of crypto.",
     },
   };
+  
+  // Button interactive style
+  const buttonStyle = isButtonPressed 
+    ? "w-full bg-yellow-400 hover:bg-yellow-500 text-black transform scale-95 transition-all duration-200" 
+    : "w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black transition-all duration-200";
   
   return (
     <div className="min-h-screen bg-[#0B0E11] flex items-center justify-center p-4">
@@ -205,8 +213,13 @@ const Auth: React.FC = () => {
                 <CardFooter className="flex flex-col">
                   <Button 
                     type="submit" 
-                    className="w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black"
+                    className={buttonStyle}
                     disabled={loading}
+                    onMouseDown={() => setIsButtonPressed(true)}
+                    onMouseUp={() => setIsButtonPressed(false)}
+                    onMouseLeave={() => setIsButtonPressed(false)}
+                    onTouchStart={() => setIsButtonPressed(true)}
+                    onTouchEnd={() => setIsButtonPressed(false)}
                   >
                     {loading ? 'Signing in...' : 'Sign In'}
                   </Button>
@@ -330,8 +343,13 @@ const Auth: React.FC = () => {
                 <CardFooter className="flex flex-col">
                   <Button 
                     type="submit" 
-                    className="w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black"
+                    className={buttonStyle}
                     disabled={loading}
+                    onMouseDown={() => setIsButtonPressed(true)}
+                    onMouseUp={() => setIsButtonPressed(false)}
+                    onMouseLeave={() => setIsButtonPressed(false)}
+                    onTouchStart={() => setIsButtonPressed(true)}
+                    onTouchEnd={() => setIsButtonPressed(false)}
                   >
                     {loading ? 'Creating Account...' : 'Create Account'}
                   </Button>
