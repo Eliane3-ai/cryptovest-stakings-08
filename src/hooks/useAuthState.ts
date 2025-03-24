@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { UserProfile } from '@/types/auth';
 
 /**
- * Hook that manages the authentication state
+ * Hook that manages the authentication state with improved session persistence
  */
 export function useAuthState() {
   const [user, setUser] = useState<User | null>(null);
@@ -16,37 +16,44 @@ export function useAuthState() {
 
   // Initialize auth state
   useEffect(() => {
-    // Set up auth state listener FIRST
+    console.log("Initializing auth state...");
+    
+    // Set up auth state listener FIRST for proper session persistence
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("Auth state changed:", event, !!session);
-        setSession(session);
-        setUser(session?.user ?? null);
+      async (event, currentSession) => {
+        console.log(`Auth state changed: ${event}`, !!currentSession);
         
-        if (session?.user) {
-          console.log("User authenticated, fetching profile...");
-          setIsEmailVerified(session.user.email_confirmed_at !== null);
+        // Update the session and user state based on the auth state change
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
+        if (currentSession?.user) {
+          console.log("User authenticated in state change:", currentSession.user.email);
+          setIsEmailVerified(currentSession.user.email_confirmed_at !== null);
         } else {
           setProfile(null);
           setIsEmailVerified(null);
         }
 
-        // Set loading to false after auth state change is processed
+        // Set loading to false after processing
         setIsLoading(false);
       }
     );
     
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Existing session check:", !!session);
-      setSession(session);
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
+      console.log("Existing session check:", !!existingSession);
       
-      if (session?.user) {
-        setIsEmailVerified(session.user.email_confirmed_at !== null);
+      // Update state with the existing session data
+      setSession(existingSession);
+      setUser(existingSession?.user ?? null);
+      
+      if (existingSession?.user) {
+        console.log("User authenticated in initial check:", existingSession.user.email);
+        setIsEmailVerified(existingSession.user.email_confirmed_at !== null);
       }
       
-      // Set loading to false after initial session check
+      // Set loading to false after initial check
       setIsLoading(false);
     });
     
@@ -59,8 +66,8 @@ export function useAuthState() {
   return {
     user,
     profile,
-    setProfile,
     session,
+    setProfile,
     isLoading,
     isEmailVerified
   };

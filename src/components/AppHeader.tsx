@@ -1,65 +1,107 @@
 
 import React from 'react';
-import { Menu, MessageCircle, Trophy } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import MainSidebar from "@/components/MainSidebar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useChatContext } from "@/contexts/ChatContext";
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Shield, Menu, User, Settings, BarChart, DollarSign, RefreshCcw, Link } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import LogoutButton from './common/LogoutButton';
 
+/**
+ * AppHeader component - Top navigation and menu for the application
+ */
 const AppHeader: React.FC = () => {
-  const { notification } = useChatContext();
+  const navigate = useNavigate();
+  const { user, profile } = useAuth();
+  
+  const username = profile?.username || user?.email?.split('@')[0] || 'User';
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
 
   return (
-    <div className="mb-6 flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <Drawer>
-          <DrawerTrigger asChild>
-            <button className="p-2 rounded-lg bg-[#2B3139] hover:bg-[#2B3139]/80 text-white">
-              <Menu className="h-6 w-6" />
-            </button>
-          </DrawerTrigger>
-          <DrawerContent className="h-[85vh] bg-[#0B0E11] border-t border-[#474D57] text-white">
-            <MainSidebar />
-            
-            <div className="px-4 mt-4 space-y-2">
-              <h3 className="text-sm font-medium text-white/60 px-3">Communication</h3>
-              
-              <Link to="/chat" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:bg-[#2B3139] transition-colors">
-                <div className="relative">
-                  <MessageCircle className="h-5 w-5 text-[#F0B90B]" />
-                  {notification.count > 0 && (
-                    <Badge className="absolute -top-2 -right-2 h-4 w-4 p-0 flex items-center justify-center bg-red-500 text-white text-xs">
-                      {notification.count > 99 ? '99+' : notification.count}
-                    </Badge>
-                  )}
-                </div>
-                <span className="font-medium">Live Chat</span>
-              </Link>
-              
-              <Link to="/winners" className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/80 hover:bg-[#2B3139] transition-colors">
-                <Trophy className="h-5 w-5 text-[#F0B90B]" />
-                <span className="font-medium">Winners</span>
-              </Link>
-            </div>
-          </DrawerContent>
-        </Drawer>
-        <h1 className="text-xl font-bold">CryptoWallet</h1>
+    <div className="flex justify-between items-center mb-6">
+      <div className="flex items-center gap-2">
+        <Shield className="h-6 w-6 text-[#F0B90B]" />
+        <span className="text-xl font-bold text-white">Crypto Vest</span>
       </div>
       
-      <div className="flex items-center gap-2">
-        <Link to="/chat">
-          <Button variant="outline" size="sm" className="relative hidden sm:flex items-center gap-1 border-[#474D57] bg-[#2B3139] text-white hover:bg-[#2B3139]/80">
-            <MessageCircle className="h-4 w-4 text-[#F0B90B]" />
-            <span>Chat</span>
-            {notification.count > 0 && (
-              <Badge className="absolute -top-2 -right-2 h-4 w-4 p-0 flex items-center justify-center bg-red-500 text-white text-xs">
-                {notification.count > 9 ? '9+' : notification.count}
-              </Badge>
-            )}
-          </Button>
-        </Link>
+      <div className="flex items-center gap-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 bg-[#1E2026] border-[#474D57] text-white">
+            <DropdownMenuLabel className="text-gray-400">
+              Hello, {username}
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-[#474D57]" />
+            <DropdownMenuGroup>
+              <DropdownMenuItem 
+                className="hover:bg-[#2B3139] cursor-pointer"
+                onClick={() => handleNavigation('/wallet')}
+              >
+                <DollarSign className="h-4 w-4 mr-2 text-[#F0B90B]" />
+                <span>Wallet</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="hover:bg-[#2B3139] cursor-pointer"
+                onClick={() => handleNavigation('/market')}
+              >
+                <RefreshCcw className="h-4 w-4 mr-2 text-[#F0B90B]" />
+                <span>Market</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="hover:bg-[#2B3139] cursor-pointer"
+                onClick={() => handleNavigation('/analytics')}
+              >
+                <BarChart className="h-4 w-4 mr-2 text-[#F0B90B]" />
+                <span>Analytics</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="hover:bg-[#2B3139] cursor-pointer"
+                onClick={() => handleNavigation('/settings')}
+              >
+                <Settings className="h-4 w-4 mr-2 text-[#F0B90B]" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="hover:bg-[#2B3139] cursor-pointer"
+                onClick={() => handleNavigation('/referral')}
+              >
+                <Link className="h-4 w-4 mr-2 text-[#F0B90B]" />
+                <span>Referral</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator className="bg-[#474D57]" />
+            <DropdownMenuItem className="hover:bg-[#2B3139] cursor-pointer focus:bg-red-900/20" asChild>
+              <LogoutButton 
+                variant="ghost" 
+                className="w-full justify-start text-red-400 hover:text-red-300" 
+                size="sm"
+              />
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        
+        <Button 
+          variant="ghost" 
+          className="text-white hover:bg-white/10 rounded-full h-8 w-8 p-0"
+          onClick={() => handleNavigation('/settings')}
+        >
+          <User className="h-5 w-5" />
+        </Button>
       </div>
     </div>
   );

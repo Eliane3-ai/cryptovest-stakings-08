@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext } from 'react';
 import { AuthContextType, AuthProviderProps } from '@/types/auth';
 import { useAuthProvider } from '@/hooks/useAuthProvider';
@@ -18,6 +19,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const {
     user,
     profile,
+    session,
     isLoading,
     isFirstLogin,
     isEmailVerified,
@@ -29,11 +31,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signIn,
     signOut,
     resendVerificationEmail,
-    verify2FA,
-    setup2FA,
-    verify2FASetup,
-    disable2FA,
-    isTwoFactorEnabled
   } = useAuthMethods();
 
   // Function to fund user wallet based on their staking knowledge
@@ -69,10 +66,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Simplified 2FA methods (removed functionality)
+  const isTwoFactorEnabled = () => false;
+
   return (
     <AuthContext.Provider value={{
       user,
       profile,
+      session,
       isLoading,
       isFirstLogin,
       isEmailVerified,
@@ -82,10 +83,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       signOut,
       getProfile,
       resendVerificationEmail,
-      verify2FA,
-      setup2FA,
-      verify2FASetup,
-      disable2FA,
+      verify2FA: async () => ({ error: null, data: {}, success: true }),
+      setup2FA: async () => ({ error: null, data: {} }),
+      verify2FASetup: async () => ({ error: null, data: {}, success: true }),
+      disable2FA: async () => ({ error: null, data: {}, success: true }),
       fundUserWallet
     }}>
       {children}

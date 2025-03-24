@@ -1,4 +1,5 @@
-import { User } from "@supabase/supabase-js";
+
+import { User, Session } from "@supabase/supabase-js";
 
 export type StakingKnowledgeLevel = 'beginner' | 'intermediate' | 'expert';
 
@@ -16,6 +17,7 @@ export interface UserProfile {
 export interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
+  session: Session | null;
   isLoading: boolean;
   isFirstLogin: boolean;
   isEmailVerified: boolean | null;
@@ -25,10 +27,10 @@ export interface AuthContextType {
   signOut: () => Promise<{ error: Error | null; data: any }>;
   getProfile: (userId: string) => Promise<UserProfile | null>;
   resendVerificationEmail: (email: string) => Promise<{ error: Error | null; data: any }>;
-  verify2FA: (token: string) => Promise<{ error: Error | null; data: any }>;
+  verify2FA: (token: string) => Promise<{ error: Error | null; data: any; success: boolean }>;
   setup2FA: () => Promise<{ error: Error | null; data: any }>;
-  verify2FASetup: (code: string) => Promise<{ error: Error | null; data: any }>;
-  disable2FA: () => Promise<{ error: Error | null; data: any }>;
+  verify2FASetup: (code: string) => Promise<{ error: Error | null; data: any; success: boolean }>;
+  disable2FA: () => Promise<{ error: Error | null; data: any; success: boolean }>;
   fundUserWallet: (userId: string, stakingKnowledge: string) => Promise<number>;
 }
 

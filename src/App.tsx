@@ -8,12 +8,23 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { GasFeeProvider } from "./contexts/GasFeeContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import { AuthProvider } from "./contexts/AuthContext";
-import LandingPage from "./pages/LandingPage";
-import Wallet from "./pages/Wallet";
+
+// Route wrappers
+import PublicRoute from "./components/route/PublicRoute";
+import ProtectedRoute from "./components/route/ProtectedRoute";
+
+// Public Pages
+import LandingPage from "./features/landing";
+import Auth from "./features/auth";
+import Contact from "./features/contact";
+
+// Protected Pages
+import Wallet from "./features/wallet";
+import Settings from "./features/settings";
+
+// Legacy pages (to be moved to feature folders later)
 import Market from "./pages/Market";
 import Analytics from "./pages/Analytics";
-import Settings from "./pages/Settings";
-import WalletConnect from "./pages/WalletConnect";
 import Exchange from "./pages/Exchange";
 import Deposit from "./pages/Deposit";
 import NotFound from "./pages/NotFound";
@@ -21,9 +32,6 @@ import Chat from "./pages/Chat";
 import Winners from "./pages/Winners";
 import WalletAddress from "./pages/WalletAddress";
 import Referral from "./pages/Referral";
-import Auth from "./pages/Auth";
-import Contact from "./pages/Contact";
-import AuthGuard from "./components/AuthGuard";
 import Diagnostics from "./pages/Diagnostics";
 
 const queryClient = new QueryClient({
@@ -47,30 +55,30 @@ const App = () => (
               <BrowserRouter>
                 <Routes>
                   {/* Public Routes - accessible without authentication */}
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/market" element={<Market />} />
-                  <Route path="/chat" element={<Chat />} />
-                  <Route path="/referral" element={<Referral />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/diagnostics" element={<Diagnostics />} />
+                  <Route element={<PublicRoute />}>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/contact" element={<Contact />} />
+                  </Route>
                   
                   {/* Protected Routes - require authentication */}
-                  <Route element={<AuthGuard />}>
+                  <Route element={<ProtectedRoute />}>
                     <Route path="/wallet" element={<Wallet />} />
+                    <Route path="/market" element={<Market />} />
                     <Route path="/analytics" element={<Analytics />} />
                     <Route path="/settings" element={<Settings />} />
-                    <Route path="/wallet-connect" element={<WalletConnect />} />
                     <Route path="/exchange" element={<Exchange />} />
                     <Route path="/deposit" element={<Deposit />} />
+                    <Route path="/chat" element={<Chat />} />
+                    <Route path="/referral" element={<Referral />} />
                     <Route path="/winners" element={<Winners />} />
                     <Route path="/wallet-address" element={<WalletAddress />} />
+                    <Route path="/diagnostics" element={<Diagnostics />} />
                   </Route>
 
-                  {/* Catch-all route */}
+                  {/* Redirect to auth if not matched */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-                {/* AiAssistant has been removed from here */}
               </BrowserRouter>
             </TooltipProvider>
           </ChatProvider>
