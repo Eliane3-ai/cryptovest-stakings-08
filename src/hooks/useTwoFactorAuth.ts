@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
  * Hook that handles two-factor authentication functionality
  */
 export function useTwoFactorAuth(auth: {
-  verify2FA: (code: string) => Promise<{ error: Error | null, success: boolean }>;
+  verify2FA: (code: string) => Promise<{ error: Error | null, data: any, success: boolean }>;
 }) {
   const { verify2FA } = auth;
   const navigate = useNavigate();

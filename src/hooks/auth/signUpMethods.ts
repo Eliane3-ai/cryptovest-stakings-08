@@ -14,7 +14,8 @@ export function useSignUpMethods() {
         email,
         password,
         options: {
-          data: userData
+          data: userData,
+          emailRedirectTo: 'https://cryptovest-staking.netlify.app/auth?verified=true'
         }
       });
       
@@ -32,7 +33,10 @@ export function useSignUpMethods() {
     try {
       const { data, error } = await supabase.auth.resend({
         type: 'signup',
-        email
+        email,
+        options: {
+          emailRedirectTo: 'https://cryptovest-staking.netlify.app/auth?verified=true'
+        }
       });
       
       return { error: error as Error | null, data: data || null };

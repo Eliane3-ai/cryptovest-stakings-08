@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { getTranslation } from '@/utils/translations';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -27,6 +26,13 @@ const SecuritySettingsSection: React.FC = () => {
   const [twoFAQRCode, setTwoFAQRCode] = useState('');
   const [twoFASecret, setTwoFASecret] = useState('');
   const [twoFAVerifying, setTwoFAVerifying] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [verificationError, setVerificationError] = useState('');
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [disableLoading, setDisableLoading] = useState(false);
+  const [showSetupDialog, setShowSetupDialog] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Initialize 2FA state from the user context
   useEffect(() => {
@@ -58,45 +64,93 @@ const SecuritySettingsSection: React.FC = () => {
     setConfirmNewPassword('');
   };
 
-  const handle2FAEnable = async () => {
-    const result = await setup2FA();
+  const handleSetup2FA = async () => {
+    setLoading(true);
+    setError(null);
     
-    if (result.error) {
-      toast({
-        title: "Setup Failed",
-        description: result.error.message,
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (result.secret && result.qrCodeUrl) {
-      setTwoFASecret(result.secret);
-      setTwoFAQRCode(result.qrCodeUrl);
-      setTwoFAOpen(true);
+    try {
+      const response = await setup2FA();
+      
+      if (response.error) {
+        console.error("2FA setup error:", response.error);
+        setError(response.error.message || getTranslation('errorOccurred', language));
+        return;
+      }
+      
+      // Updated to use the consistent response format
+      if (response.secret && response.qrCodeUrl) {
+        setTwoFactorSecret(response.secret);
+        setTwoFactorQrCode(response.qrCodeUrl);
+        setShowSetupDialog(true);
+      } else {
+        setError(getTranslation('errorOccurred', language));
+      }
+    } catch (error) {
+      console.error("2FA setup error:", error);
+      setError(getTranslation('errorOccurred', language));
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handle2FAVerify = async () => {
-    setTwoFAVerifying(true);
+  const handleVerify2FASetup = async () => {
+    if (!verificationCode) {
+      setVerificationError(getTranslation('enterVerificationCode', language));
+      return;
+    }
+    
+    setVerifyLoading(true);
+    setVerificationError(null);
     
     try {
-      const result = await verify2FASetup(twoFACode);
+      const response = await verify2FASetup(verificationCode);
       
-      if (result.success) {
-        setTwoFAEnabled(true);
-        setTwoFAOpen(false);
+      if (response.success) {
+        setShowSetupDialog(false);
+        setTwoFactorEnabled(true);
+        toast({
+          title: getTranslation('success', language),
+          description: getTranslation('twoFactorEnabled', language),
+        });
+      } else {
+        setVerificationError(response.error?.message || getTranslation('invalidCode', language));
       }
+    } catch (error) {
+      console.error("2FA verification error:", error);
+      setVerificationError(getTranslation('errorOccurred', language));
     } finally {
-      setTwoFAVerifying(false);
+      setVerifyLoading(false);
     }
   };
 
   const handle2FADisable = async () => {
-    const result = await disable2FA();
+    setDisableLoading(true);
     
-    if (result.success) {
-      setTwoFAEnabled(false);
+    try {
+      const response = await disable2FA();
+      
+      if (response.success) {
+        setTwoFactorEnabled(false);
+        toast({
+          title: getTranslation('success', language),
+          description: getTranslation('twoFactorDisabled', language),
+        });
+      } else {
+        toast({
+          title: getTranslation('error', language),
+          description: response.error?.message || getTranslation('errorOccurred', language),
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("2FA disable error:", error);
+      toast({
+        title: getTranslation('error', language),
+        description: getTranslation('errorOccurred', language),
+        variant: "destructive",
+      });
+    } finally {
+      setDisableLoading(false);
     }
   };
 
@@ -144,7 +198,7 @@ const SecuritySettingsSection: React.FC = () => {
             </div>
             {!twoFAEnabled ? (
               <Button
-                onClick={handle2FAEnable}
+                onClick={handleSetup2FA}
                 variant="outline"
                 className="border-[#F0B90B] text-[#F0B90B] hover:bg-[#F0B90B]/10"
               >
@@ -279,7 +333,7 @@ const SecuritySettingsSection: React.FC = () => {
               Cancel
             </Button>
             <Button 
-              onClick={handle2FAVerify}
+              onClick={handleVerify2FASetup}
               disabled={twoFACode.length !== 6 || twoFAVerifying}
               className="bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black"
             >

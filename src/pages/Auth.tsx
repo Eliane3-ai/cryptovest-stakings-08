@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useAuthPage } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 // Import components
 import AuthCard from '@/components/auth/AuthCard';
@@ -10,6 +11,14 @@ import AuthHeader from '@/components/auth/AuthHeader';
 
 const Auth: React.FC = () => {
   const { toast } = useToast();
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Parse URL parameters for email verification
+  const searchParams = new URLSearchParams(location.search);
+  const isVerified = searchParams.get('verified') === 'true';
+  const tab = searchParams.get('tab') || 'login'; // Get tab parameter if provided
+  
   const {
     // User and auth data
     user,
@@ -35,8 +44,6 @@ const Auth: React.FC = () => {
     referralCode,
     verified,
     from,
-    // Navigation
-    navigate,
     // Handlers
     handleLogin,
     handleSignup,
@@ -45,20 +52,30 @@ const Auth: React.FC = () => {
     cancelTwoFactor
   } = useAuthPage();
   
+  // Set active tab based on URL parameter
+  useEffect(() => {
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, [tab, setActiveTab]);
+  
   // Show toast when redirected from verification link
   useEffect(() => {
-    if (verified) {
+    if (isVerified || verified) {
       toast({
         title: "Email Verified",
         description: "Your email has been verified. You can now log in.",
         variant: "default"
       });
       
+      // Set active tab to login if email is verified
+      setActiveTab('login');
+      
       // Clear the verified parameter from URL
       const newUrl = window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
     }
-  }, [verified, toast]);
+  }, [isVerified, verified, toast, setActiveTab]);
   
   // Force redirect if already logged in
   useEffect(() => {

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from './use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Hook that provides authentication action handlers
@@ -29,7 +30,7 @@ export function useAuthActions(auth: {
     email: string,
     password: string,
     setIsButtonPressed: (pressed: boolean) => void,
-    redirectPath: string
+    redirectPath: string = '/wallet'
   ): Promise<void> => {
     e.preventDefault();
     setLoading(true);
@@ -49,7 +50,7 @@ export function useAuthActions(auth: {
         return;
       }
       
-      // Check if 2FA is required
+      // Check if 2FA is required - in our simplified implementation this is always false
       const user = data?.user;
       if (user?.user_metadata?.two_factor_enabled === true) {
         console.log("2FA required");
@@ -59,6 +60,10 @@ export function useAuthActions(auth: {
       
       // Successful login without 2FA
       console.log("Login successful, redirecting to:", redirectPath);
+      toast({
+        title: "Login Successful",
+        description: "Welcome back to Crypto Vest!",
+      });
       navigate(redirectPath, { replace: true });
     } catch (error) {
       console.error("Login exception:", error);
@@ -113,9 +118,25 @@ export function useAuthActions(auth: {
         return;
       }
       
-      // Successful signup
-      console.log("Signup successful:", data);
-      setVerificationSent(true);
+      // Check if email confirmation is required
+      const user = data?.user;
+      const isEmailConfirmationRequired = !user?.email_confirmed_at;
+
+      if (isEmailConfirmationRequired) {
+        console.log("Email confirmation required, showing verification sent page");
+        setVerificationSent(true);
+        
+        // Explicitly tell the user about verification, with site URL info
+        toast({
+          title: "Verification Email Sent",
+          description: "Please check your email inbox and click the verification link. You'll be redirected to https://cryptovest-staking.netlify.app after verification.",
+          duration: 8000,
+        });
+      } else {
+        // Direct login if no email confirmation needed (less common)
+        console.log("Signup successful, redirecting to wallet");
+        navigate('/wallet', { replace: true });
+      }
     } catch (error) {
       console.error("Signup exception:", error);
       toast({
@@ -146,7 +167,15 @@ export function useAuthActions(auth: {
     
     try {
       console.log("Resending verification email to:", email);
-      const { error } = await resendVerificationEmail(email);
+      
+      // Update to use Supabase directly to ensure correct redirect URL
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+          emailRedirectTo: 'https://cryptovest-staking.netlify.app/auth?verified=true'
+        }
+      });
       
       if (error) {
         console.error("Resend verification error:", error);
@@ -161,7 +190,8 @@ export function useAuthActions(auth: {
       // Successfully resent
       toast({
         title: "Verification Email Sent",
-        description: "Please check your email inbox",
+        description: "Please check your email inbox. You'll be redirected to https://cryptovest-staking.netlify.app after verification.",
+        duration: 8000,
       });
     } catch (error) {
       console.error("Resend verification exception:", error);
