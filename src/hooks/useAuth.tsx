@@ -31,7 +31,7 @@ export function useAuthPage() {
   const { referralCode, verified, from } = useAuthParams();
   
   // Initialize 2FA state
-  const twoFactorState = useTwoFactorAuth({ verify2FA });
+  const twoFactorState = useTwoFactorAuth();
   
   // Initialize authentication actions
   const authActions = useAuthActions({

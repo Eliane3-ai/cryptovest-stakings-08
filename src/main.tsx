@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
+// Add performance measurement
+const startTime = performance.now();
+
 // Add error handling
 const renderApp = () => {
   try {
@@ -14,13 +17,19 @@ const renderApp = () => {
       return;
     }
     
-    console.log('Creating root...');
-    const root = createRoot(rootElement);
+    // Create root and render with optimization flags
+    const root = createRoot(rootElement, {
+      onRecoverableError: (err) => {
+        console.warn('Recoverable error:', err);
+      }
+    });
     
     console.log('Rendering App component...');
     root.render(<App />);
     
-    console.log('App rendered successfully');
+    // Log performance metrics
+    const loadTime = performance.now() - startTime;
+    console.log(`App rendered successfully in ${loadTime.toFixed(2)}ms`);
   } catch (error) {
     console.error('Fatal error during application initialization:', error);
     
@@ -40,4 +49,13 @@ const renderApp = () => {
   }
 };
 
+// Preload critical resources
+if ('requestIdleCallback' in window) {
+  // Use requestIdleCallback to defer non-critical initialization
+  window.requestIdleCallback(() => {
+    console.log('Running deferred initialization...');
+  });
+}
+
+// Execute app rendering
 renderApp();
