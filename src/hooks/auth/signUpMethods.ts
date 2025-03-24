@@ -1,49 +1,27 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
 /**
- * Hook for user sign-up and email verification methods
+ * Hook that provides sign-up related methods
  */
 export function useSignUpMethods() {
-  const { toast } = useToast();
-
   /**
-   * Register a new user with email and password
+   * Sign up a new user with email and password
    */
-  const signUp = async (email: string, password: string, userData?: {
-    username?: string;
-    full_name?: string;
-    referral_code?: string;
-    mobile_number?: string;
-    country?: string;
-  }) => {
+  const signUp = async (email: string, password: string, userData?: any) => {
     try {
-      console.log("Signing up user:", email);
-      const { error, data } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: userData,
-          emailRedirectTo: window.location.origin + '/auth?verified=true'
+          data: userData
         }
       });
       
-      if (error) {
-        console.error("Signup error:", error);
-        return { error };
-      } else {
-        console.log("Signup successful, email verification sent:", data);
-        // Show toast for email verification
-        toast({
-          title: "Account Created",
-          description: "Please check your email to verify your account.",
-        });
-        return { error: null, data };
-      }
+      return { error: error as Error | null, data: data || null };
     } catch (error) {
-      console.error("Signup exception:", error);
-      return { error: error as Error };
+      console.error("Error signing up:", error);
+      return { error: error as Error, data: null };
     }
   };
 
@@ -52,34 +30,15 @@ export function useSignUpMethods() {
    */
   const resendVerificationEmail = async (email: string) => {
     try {
-      console.log("Resending verification email to:", email);
-      const { error, data } = await supabase.auth.resend({
+      const { data, error } = await supabase.auth.resend({
         type: 'signup',
-        email,
-        options: {
-          emailRedirectTo: window.location.origin + '/auth?verified=true'
-        }
+        email
       });
       
-      if (error) {
-        console.error("Error resending verification email:", error);
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive"
-        });
-        return { error };
-      } else {
-        console.log("Verification email resent successfully");
-        toast({
-          title: "Email Sent",
-          description: "Verification email has been resent. Please check your inbox.",
-        });
-        return { error: null, data };
-      }
+      return { error: error as Error | null, data: data || null };
     } catch (error) {
-      console.error("Resend verification email exception:", error);
-      return { error: error as Error };
+      console.error("Error resending verification email:", error);
+      return { error: error as Error, data: null };
     }
   };
 

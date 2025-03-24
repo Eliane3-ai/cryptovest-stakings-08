@@ -15,8 +15,8 @@ import GasFeeTopUpDialog from "@/components/dialogs/GasFeeTopUpDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
-const Index: React.FC = () => {
-  console.log("Index component is rendering");
+const Wallet: React.FC = () => {
+  console.log("Wallet component is rendering");
   
   const { 
     activeTab, 
@@ -80,7 +80,7 @@ const Index: React.FC = () => {
     }
   }, [isFirstLogin, user, profile, fundUserWallet, toast, setCustomInitialFunding, isFundingComplete]);
 
-  console.log("Index component rendering UI");
+  console.log("Wallet component rendering UI");
 
   return (
     <div className="min-h-screen bg-[#0B0E11] text-white">
@@ -138,4 +138,4 @@ const Index: React.FC = () => {
   );
 };
 
-export default Index;
+export default Wallet;
