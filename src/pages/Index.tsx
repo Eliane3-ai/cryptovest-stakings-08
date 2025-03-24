@@ -9,22 +9,54 @@ import FeaturesSection from '@/components/landing/FeaturesSection';
 import TestimonialsSection from '@/components/landing/TestimonialsSection';
 import CtaSection from '@/components/landing/CtaSection';
 import FooterSection from '@/components/landing/FooterSection';
+import { useToast } from '@/hooks/use-toast';
 
 const Index: React.FC = () => {
   const { user, isLoading } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
+  // Ensure redirection happens properly after authentication
   useEffect(() => {
     if (user) {
+      // Log navigation attempt
+      console.log("User authenticated, redirecting to wallet");
       navigate('/wallet');
     }
   }, [user, navigate]);
 
   const handleGetStarted = () => {
     if (user) {
+      // Log navigation attempt
+      console.log("handleGetStarted called, user authenticated, navigating to wallet");
       navigate('/wallet');
     } else {
+      // Log navigation attempt
+      console.log("handleGetStarted called, user not authenticated, navigating to auth");
       navigate('/auth');
+    }
+  };
+
+  // Handle wallet navigation specifically
+  const handleWalletNavigation = () => {
+    if (user) {
+      // Log navigation attempt
+      console.log("handleWalletNavigation called, navigating to wallet");
+      navigate('/wallet');
+      // Add toast notification for feedback
+      toast({
+        title: "Accessing Wallet",
+        description: "Welcome to your Crypto Vest wallet",
+      });
+    } else {
+      // Log navigation attempt
+      console.log("handleWalletNavigation called but user not authenticated, navigating to auth");
+      navigate('/auth', { state: { from: '/wallet' } });
+      // Add toast for feedback
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to access your wallet",
+      });
     }
   };
 
@@ -38,9 +70,13 @@ const Index: React.FC = () => {
           </div>
           <div className="ml-auto flex gap-4">
             {user ? (
-              <Button variant="default" onClick={() => navigate('/wallet')}>
+              <Button 
+                variant="default" 
+                onClick={handleWalletNavigation}
+                className="group"
+              >
                 My Wallet
-                <ChevronRight className="ml-1 h-4 w-4" />
+                <ChevronRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             ) : (
               <>
@@ -57,8 +93,7 @@ const Index: React.FC = () => {
       </nav>
 
       <main>
-        {/* Remove the handleGetStarted prop since HeroSection in LandingPage.tsx doesn't accept it */}
-        <HeroSection />
+        <HeroSection handleGetStarted={handleGetStarted} />
         <FeaturesSection />
         <TestimonialsSection />
         <CtaSection />

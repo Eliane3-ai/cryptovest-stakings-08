@@ -1,4 +1,5 @@
 
+// Chat user type
 export interface ChatUser {
   id: string;
   name: string;
@@ -8,62 +9,52 @@ export interface ChatUser {
   isAdmin?: boolean;
 }
 
+// Chat media type
+export interface ChatMedia {
+  type: 'image' | 'video';
+  url: string;
+}
+
+// Chat message type
 export interface ChatMessage {
   id: string;
   userId: string;
   message: string;
   timestamp: Date;
-  type: 'withdrawal' | 'deposit' | 'price' | 'news' | 'general';
-  media?: { 
-    type: 'image' | 'video';
-    url: string;
-  };
+  type?: 'withdrawal' | 'deposit' | 'price' | 'news' | 'general';
   isPrivate?: boolean;
   recipientId?: string;
-  replyToId?: string | null;
+  media?: ChatMedia;
 }
 
+// Chat notification type
 export interface ChatNotification {
   count: number;
-  lastSeen: Date;
+  lastMessage?: string;
 }
 
+// Chat messages component props
 export interface ChatMessagesProps {
-  maxHeight: string;
-  className: string;
-  onReplySwipe: (messageId: string) => void;
+  maxHeight?: string;
+  className?: string;
+  onReplySwipe?: (messageId: string) => void;
 }
 
-export interface WalletAddress {
-  id: string;
-  name: string;
-  address: string;
-  network: string;
-  coin: string;
-  isDefault: boolean;
+// Chat context type
+export interface ChatContextType {
+  users: ChatUser[];
+  messages: ChatMessage[];
+  isLoading: boolean;
+  sendMessage: (message: string) => void;
+  sendPrivateMessage: (message: string, recipientId: string) => void;
+  adminBot: ChatUser;
+  chatOpen: boolean;
+  setChatOpen: (open: boolean) => void;
+  notification: ChatNotification;
+  resetNotification: () => void;
 }
 
-export interface Referral {
-  id: string;
-  userId: string;
-  code: string;
-  referredUserId?: string;
-  status: 'pending' | 'completed';
-  createdAt: Date;
-}
-
-export interface ReferralStats {
-  totalReferrals: number;
-  completedReferrals: number;
-  pendingReferrals: number;
-  totalEarned: number;
-}
-
-export interface DailyTask {
-  id: string;
-  title: string;
-  description: string;
-  reward: number;
-  isCompleted: boolean;
-  expiresAt: Date;
+// Chat provider props
+export interface ChatProviderProps {
+  children: React.ReactNode;
 }
