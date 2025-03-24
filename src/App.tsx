@@ -9,7 +9,7 @@ import { GasFeeProvider } from "./contexts/GasFeeContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import LandingPage from "./pages/LandingPage";
-import Wallet from "./pages/Index";
+import Wallet from "./pages/Wallet";
 import Market from "./pages/Market";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
