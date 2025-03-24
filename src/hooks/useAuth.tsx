@@ -71,6 +71,13 @@ export function useAuthPage() {
       }
       
       // Successful login will redirect via the useEffect
+      toast({
+        title: "Login Successful",
+        description: "Welcome to your Crypto Vest account!",
+      });
+      
+      // Explicit navigation to ensure redirect happens
+      navigate(from || '/wallet', { replace: true });
     } catch (error) {
       console.error('Login error:', error);
       toast({
@@ -160,7 +167,7 @@ export function useAuthPage() {
       });
       
       // Redirect to the dashboard or requested page
-      navigate(from, { replace: true });
+      navigate(from || '/wallet', { replace: true });
     } catch (error) {
       console.error('2FA verification error:', error);
       setTwoFactorError("An error occurred during verification");

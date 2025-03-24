@@ -60,10 +60,11 @@ const Auth: React.FC = () => {
     }
   }, [verified, toast]);
   
-  // Redirect if already logged in
+  // Force redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate(from, { replace: true });
+      console.log("Auth: User already logged in, redirecting to", from || '/wallet');
+      navigate(from || '/wallet', { replace: true });
     }
   }, [user, navigate, from]);
 

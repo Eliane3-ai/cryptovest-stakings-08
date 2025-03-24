@@ -1,47 +1,75 @@
+
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import AppHeader from "@/components/AppHeader";
+import { Wallet, Copy, Check, QrCode } from "lucide-react";
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader } from '@/components/ui/card';
-import AppHeader from '@/components/AppHeader';
-import { useChatContext } from '@/contexts/ChatContext';
-import { WalletAddress as WalletAddressType } from '@/types/chat';
+
+interface WalletAddressParams {
+  address?: string;
+}
 
 const WalletAddress: React.FC = () => {
-  const navigate = useNavigate();
+  const { address } = useParams<WalletAddressParams>();
+  const [copied, setCopied] = React.useState(false);
+  
+  const handleCopy = () => {
+    if (!address) return;
+    
+    navigator.clipboard.writeText(address);
+    setCopied(true);
+    
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  };
   
   return (
-    <div className="min-h-screen bg-[#0B0E11] text-white">
+    <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="flex items-center gap-3 mb-6">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => navigate('/')}
-            className="text-white hover:bg-white/10"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-xl font-bold">Wallet Addresses</h1>
-        </div>
+        <AppHeader />
         
-        <Card className="border-[#474D57] bg-[#1E2026]">
-          <CardHeader className="flex flex-row items-center justify-between p-4 border-b border-[#474D57]">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-medium">Manage Your Wallet Addresses</h2>
+        <div className="mt-8 flex flex-col">
+          <div className="bg-card p-6 rounded-lg border border-border">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                  <Wallet className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-medium">Wallet Address</h2>
+                  <p className="text-sm text-muted-foreground">View and share your wallet address</p>
+                </div>
+              </div>
             </div>
-          </CardHeader>
-          
-          <div className="p-4">
-            {/* Wallet address management content goes here */}
-            <div className="text-center py-8">
-              <p className="text-gray-400">No saved wallet addresses yet.</p>
-              <Button className="mt-4 bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black">
-                Add New Address
-              </Button>
+            
+            <div className="mt-6">
+              <div className="p-4 bg-background rounded-md border border-border flex items-center justify-between overflow-hidden">
+                <div className="font-mono text-sm truncate">
+                  {address || '0x1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t'}
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className={copied ? "text-green-500" : ""}
+                  onClick={handleCopy}
+                >
+                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
+              
+              <div className="mt-6 flex justify-center">
+                <div className="p-4 bg-white rounded-lg">
+                  <QrCode className="h-40 w-40 text-black" />
+                </div>
+              </div>
+              
+              <p className="text-sm text-muted-foreground text-center mt-4">
+                Scan this QR code to receive payments to your wallet
+              </p>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );

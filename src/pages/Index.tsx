@@ -16,49 +16,52 @@ const Index: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Ensure redirection happens properly after authentication
+  // Force redirection to wallet when user is authenticated
   useEffect(() => {
-    if (user) {
-      // Log navigation attempt
-      console.log("User authenticated, redirecting to wallet");
-      navigate('/wallet');
+    if (user && !isLoading) {
+      console.log("User is authenticated, redirecting to wallet page");
+      navigate('/wallet', { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, isLoading, navigate]);
 
   const handleGetStarted = () => {
     if (user) {
-      // Log navigation attempt
-      console.log("handleGetStarted called, user authenticated, navigating to wallet");
+      console.log("handleGetStarted: User is authenticated, navigating to wallet");
       navigate('/wallet');
     } else {
-      // Log navigation attempt
-      console.log("handleGetStarted called, user not authenticated, navigating to auth");
+      console.log("handleGetStarted: User not authenticated, navigating to auth");
       navigate('/auth');
     }
   };
 
-  // Handle wallet navigation specifically
-  const handleWalletNavigation = () => {
+  // Handle wallet navigation with proper event handling
+  const handleWalletNavigation = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent default button behavior
+    
     if (user) {
-      // Log navigation attempt
-      console.log("handleWalletNavigation called, navigating to wallet");
+      console.log("handleWalletNavigation: User is authenticated, navigating to wallet");
       navigate('/wallet');
-      // Add toast notification for feedback
+      
       toast({
         title: "Accessing Wallet",
-        description: "Welcome to your Crypto Vest wallet",
+        description: "Loading your Crypto Vest wallet...",
       });
     } else {
-      // Log navigation attempt
-      console.log("handleWalletNavigation called but user not authenticated, navigating to auth");
+      console.log("handleWalletNavigation: User not authenticated, navigating to auth");
       navigate('/auth', { state: { from: '/wallet' } });
-      // Add toast for feedback
+      
       toast({
         title: "Authentication Required",
         description: "Please sign in to access your wallet",
+        variant: "destructive",
       });
     }
   };
+
+  // If the user is already authenticated, don't render the landing page
+  if (user && !isLoading) {
+    return null; // Return null while redirecting to prevent flash of landing page
+  }
 
   return (
     <div className="min-h-screen bg-background">

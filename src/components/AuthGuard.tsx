@@ -51,9 +51,10 @@ const AuthGuard: React.FC = () => {
   // If user is authenticated but email not verified, still allow access but warn them
   if (user && isEmailVerified === false) {
     console.log("User authenticated but email not verified, allowing access with warning");
+  } else {
+    console.log("User authenticated, rendering protected route:", location.pathname);
   }
   
-  console.log("User authenticated, rendering protected route:", location.pathname);
   // User is authenticated, render the protected route
   return <Outlet />;
 };
