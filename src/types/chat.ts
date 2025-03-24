@@ -25,12 +25,14 @@ export interface ChatMessage {
   isPrivate?: boolean;
   recipientId?: string;
   media?: ChatMedia;
+  replyToId?: string | null;
 }
 
 // Chat notification type
 export interface ChatNotification {
   count: number;
   lastMessage?: string;
+  lastSeen?: Date;
 }
 
 // Chat messages component props
