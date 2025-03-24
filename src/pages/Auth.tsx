@@ -68,6 +68,23 @@ const Auth: React.FC = () => {
     }
   }, [user, navigate, from]);
 
+  // TypeScript helper function to bridge the return type differences
+  const handleLoginWrapper = async (e: React.FormEvent) => {
+    await handleLogin(e);
+  };
+
+  const handleSignupWrapper = async (e: React.FormEvent) => {
+    await handleSignup(e);
+  };
+
+  const handleResendVerificationWrapper = async () => {
+    await handleResendVerification();
+  };
+
+  const handle2FAVerifyWrapper = async (code: string) => {
+    await handle2FAVerify(code);
+  };
+
   return (
     <div className="min-h-screen bg-[#0B0E11] flex items-center justify-center p-4">
       <div className="max-w-md w-full">
@@ -76,7 +93,7 @@ const Auth: React.FC = () => {
         {verificationSent ? (
           <VerificationSent
             email={email}
-            handleResendVerification={handleResendVerification}
+            handleResendVerification={handleResendVerificationWrapper}
             resendLoading={resendLoading}
             setVerificationSent={setVerificationSent}
             setActiveTab={setActiveTab}
@@ -103,10 +120,10 @@ const Auth: React.FC = () => {
             setConfirmPassword={setConfirmPassword}
             loading={loading}
             isEmailVerified={isEmailVerified}
-            handleLogin={handleLogin}
-            handleSignup={handleSignup}
-            handleResendVerification={handleResendVerification}
-            handle2FAVerify={handle2FAVerify}
+            handleLogin={handleLoginWrapper}
+            handleSignup={handleSignupWrapper}
+            handleResendVerification={handleResendVerificationWrapper}
+            handle2FAVerify={handle2FAVerifyWrapper}
             showTwoFactor={showTwoFactor}
             twoFactorError={twoFactorError}
             cancelTwoFactor={cancelTwoFactor}
