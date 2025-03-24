@@ -1,16 +1,11 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import AppHeader from "@/components/AppHeader";
 import { Wallet, Copy, Check, QrCode } from "lucide-react";
 import { Button } from '@/components/ui/button';
 
-interface WalletAddressParams {
-  address?: string;
-}
-
 const WalletAddress: React.FC = () => {
-  const { address } = useParams<WalletAddressParams>();
+  const { address } = useParams<{ address?: string }>();
   const [copied, setCopied] = React.useState(false);
   
   const handleCopy = () => {
