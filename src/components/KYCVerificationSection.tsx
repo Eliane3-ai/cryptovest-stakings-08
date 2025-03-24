@@ -1,6 +1,5 @@
-
-import React, { useState } from 'react';
-import { User, Globe, Phone, MapPin, CreditCard, Upload, Edit2, Loader2, CheckCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Globe, Phone, MapPin, CreditCard, Upload, Edit2, Loader2, CheckCircle, X } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -9,117 +8,233 @@ import { toast } from "sonner";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslation } from '@/utils/translations';
 import { useNavigate } from 'react-router-dom';
-
-const KYC_KEY = 'crypto_wallet_kyc_data';
-
-interface KYCData {
-  fullName: string;
-  email: string;
-  mobile: string;
-  country: string;
-  address: string;
-  idCardFile?: string;
-  isVerified: boolean;
-  isPending?: boolean;
-  submissionDate?: string;
-}
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { KycVerification, KycFormData } from '@/types/kyc';
 
 const KYCVerificationSection: React.FC = () => {
   const { language } = useLanguage();
+  const { user } = useAuth();
   const [kycDialogOpen, setKycDialogOpen] = useState(false);
   const navigate = useNavigate();
   
-  // Load KYC data from localStorage if it exists
-  const [kycData, setKycData] = useState<KYCData>(() => {
-    const savedData = localStorage.getItem(KYC_KEY);
-    return savedData ? JSON.parse(savedData) : {
-      fullName: '',
-      email: '',
-      mobile: '',
-      country: '',
-      address: '',
-      idCardFile: '',
-      isVerified: false,
-      isPending: false
-    };
+  const [kycData, setKycData] = useState<KycVerification | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState<KycFormData>({
+    full_name: '',
+    email: '',
+    mobile: '',
+    country: '',
+    address: '',
   });
 
-  const [kycFormData, setKycFormData] = useState<KYCData>(kycData);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
 
-  const handleKYCSubmit = (e: React.FormEvent) => {
+  const fetchKycData = async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('kyc_verifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Error fetching KYC data:', error);
+        toast.error(getTranslation('errorFetchingKYC', language));
+        return;
+      }
+      
+      setKycData(data as KycVerification);
+      
+      if (data) {
+        setFormData({
+          full_name: data.full_name,
+          email: data.email,
+          mobile: data.mobile,
+          country: data.country,
+          address: data.address,
+        });
+      }
+    } catch (error) {
+      console.error('Error in fetchKycData:', error);
+      toast.error(getTranslation('errorFetchingKYC', language));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchKycData();
+  }, [user]);
+
+  const uploadIdCard = async (file: File): Promise<string | null> => {
+    if (!user || !file) return null;
+    
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}-kyc-document.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('kyc_documents')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+      
+      if (error) {
+        console.error('Error uploading KYC document:', error);
+        throw error;
+      }
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('kyc_documents')
+        .getPublicUrl(fileName);
+      
+      return publicUrl;
+    } catch (error) {
+      console.error('Error in uploadIdCard:', error);
+      throw error;
+    }
+  };
+
+  const handleKYCSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Show upload progress for ID card
-    if (!kycFormData.idCardFile) {
+    if (!user) {
+      toast.error(getTranslation('pleaseLogin', language));
+      return;
+    }
+    
+    if (!formData.full_name || !formData.email || !formData.mobile || 
+        !formData.country || !formData.address) {
+      toast.error(getTranslation('fillAllFields', language));
+      return;
+    }
+    
+    if (!kycData && !formData.id_card_file) {
       toast.error(getTranslation('pleaseUploadID', language));
       return;
     }
     
     setUploading(true);
     
-    // Simulate upload progress
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            // Save KYC data to localStorage
-            const currentDate = new Date().toISOString();
-            const updatedData = {
-              ...kycFormData, 
-              isPending: true, 
-              isVerified: false,
-              submissionDate: currentDate
-            };
-            
-            localStorage.setItem(KYC_KEY, JSON.stringify(updatedData));
-            setKycData(updatedData);
-            
-            setUploading(false);
-            setKycDialogOpen(false);
-            setSuccessDialogOpen(true);
-            
-            setUploadProgress(0);
-          }, 500);
-          return 100;
+    try {
+      let idCardUrl = kycData?.id_card_url;
+      
+      if (formData.id_card_file) {
+        const progressInterval = setInterval(() => {
+          setUploadProgress(prev => {
+            if (prev >= 90) {
+              clearInterval(progressInterval);
+              return 90;
+            }
+            return prev + 5;
+          });
+        }, 200);
+        
+        idCardUrl = await uploadIdCard(formData.id_card_file);
+        
+        clearInterval(progressInterval);
+        setUploadProgress(100);
+      }
+      
+      if (kycData) {
+        const { error } = await supabase
+          .from('kyc_verifications')
+          .update({
+            full_name: formData.full_name,
+            email: formData.email,
+            mobile: formData.mobile,
+            country: formData.country,
+            address: formData.address,
+            id_card_url: idCardUrl,
+            status: 'pending',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', kycData.id);
+        
+        if (error) {
+          console.error('Error updating KYC data:', error);
+          toast.error(getTranslation('errorUpdatingKYC', language));
+          return;
         }
-        return prev + 5;
-      });
-    }, 200);
+      } else {
+        const { error } = await supabase
+          .from('kyc_verifications')
+          .insert({
+            user_id: user.id,
+            full_name: formData.full_name,
+            email: formData.email,
+            mobile: formData.mobile,
+            country: formData.country,
+            address: formData.address,
+            id_card_url: idCardUrl,
+            status: 'pending'
+          });
+        
+        if (error) {
+          console.error('Error inserting KYC data:', error);
+          toast.error(getTranslation('errorSubmittingKYC', language));
+          return;
+        }
+      }
+      
+      await fetchKycData();
+      
+      setKycDialogOpen(false);
+      setSuccessDialogOpen(true);
+      setUploadProgress(0);
+    } catch (error) {
+      console.error('Error in handleKYCSubmit:', error);
+      toast.error(getTranslation('errorProcessingKYC', language));
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleIdCardUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      // Simulate file upload by just storing the file name
-      setKycFormData({
-        ...kycFormData, 
-        idCardFile: e.target.files[0].name
+      setFormData({
+        ...formData,
+        id_card_file: e.target.files[0]
       });
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setKycFormData({
-      ...kycFormData,
+    setFormData({
+      ...formData,
       [name]: value
     });
   };
   
   const handleSuccessDialogClose = () => {
     setSuccessDialogOpen(false);
-    // Redirect to wallet page
     navigate('/');
   };
+
+  if (loading) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-border p-6 mb-6">
+        <div className="flex justify-center items-center p-10">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          <span className="ml-2">{getTranslation('loading', language)}</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl border border-border p-6 mb-6">
       <h2 className="text-lg font-medium mb-4">{getTranslation('kycVerification', language)}</h2>
       
-      {kycData.isVerified ? (
+      {kycData?.status === 'approved' ? (
         <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-900/30 mb-6">
           <div className="flex items-center">
             <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center text-green-600 dark:text-green-400 mr-4">
@@ -131,7 +246,29 @@ const KYCVerificationSection: React.FC = () => {
             </div>
           </div>
         </div>
-      ) : kycData.isPending ? (
+      ) : kycData?.status === 'rejected' ? (
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-900/30 mb-6">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center text-red-600 dark:text-red-400 mr-4">
+              <X className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="font-medium text-red-800 dark:text-red-400">{getTranslation('verificationRejected', language)}</h3>
+              <p className="text-sm text-red-700 dark:text-red-500 mt-1">
+                {getTranslation('verificationRejectedDesc', language)}
+                {kycData.admin_notes && (
+                  <span className="block mt-2 font-semibold">
+                    {getTranslation('rejectionReason', language)}: {kycData.admin_notes}
+                  </span>
+                )}
+              </p>
+              <p className="text-sm text-red-700 dark:text-red-500 mt-3">
+                {getTranslation('pleaseUpdateAndResubmit', language)}
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : kycData?.status === 'pending' ? (
         <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-900/30 mb-6">
           <div className="flex items-center">
             <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 mr-4">
@@ -141,9 +278,9 @@ const KYCVerificationSection: React.FC = () => {
               <h3 className="font-medium text-blue-800 dark:text-blue-400">{getTranslation('verificationPending', language)}</h3>
               <p className="text-sm text-blue-700 dark:text-blue-500 mt-1">
                 {getTranslation('verificationPendingDesc', language)}
-                {kycData.submissionDate && (
+                {kycData.created_at && (
                   <span className="block mt-1">
-                    {getTranslation('submittedOn', language)}: {new Date(kycData.submissionDate).toLocaleDateString()}
+                    {getTranslation('submittedOn', language)}: {new Date(kycData.created_at).toLocaleDateString()}
                   </span>
                 )}
               </p>
@@ -174,7 +311,7 @@ const KYCVerificationSection: React.FC = () => {
               {getTranslation('fullName', language)}
             </h3>
             <p className="text-sm text-muted-foreground border p-2 rounded-md">
-              {kycData.fullName || getTranslation('notProvided', language)}
+              {kycData?.full_name || getTranslation('notProvided', language)}
             </p>
           </div>
           <div>
@@ -183,7 +320,7 @@ const KYCVerificationSection: React.FC = () => {
               {getTranslation('emailAddress', language)}
             </h3>
             <p className="text-sm text-muted-foreground border p-2 rounded-md">
-              {kycData.email || getTranslation('notProvided', language)}
+              {kycData?.email || getTranslation('notProvided', language)}
             </p>
           </div>
           <div>
@@ -192,7 +329,7 @@ const KYCVerificationSection: React.FC = () => {
               {getTranslation('mobileNumber', language)}
             </h3>
             <p className="text-sm text-muted-foreground border p-2 rounded-md">
-              {kycData.mobile || getTranslation('notProvided', language)}
+              {kycData?.mobile || getTranslation('notProvided', language)}
             </p>
           </div>
           <div>
@@ -201,7 +338,7 @@ const KYCVerificationSection: React.FC = () => {
               {getTranslation('country', language)}
             </h3>
             <p className="text-sm text-muted-foreground border p-2 rounded-md">
-              {kycData.country || getTranslation('notProvided', language)}
+              {kycData?.country || getTranslation('notProvided', language)}
             </p>
           </div>
           <div className="md:col-span-2">
@@ -210,7 +347,7 @@ const KYCVerificationSection: React.FC = () => {
               {getTranslation('address', language)}
             </h3>
             <p className="text-sm text-muted-foreground border p-2 rounded-md">
-              {kycData.address || getTranslation('notProvided', language)}
+              {kycData?.address || getTranslation('notProvided', language)}
             </p>
           </div>
           <div>
@@ -219,17 +356,39 @@ const KYCVerificationSection: React.FC = () => {
               {getTranslation('idCard', language)}
             </h3>
             <p className="text-sm text-muted-foreground border p-2 rounded-md">
-              {kycData.idCardFile || getTranslation('notUploaded', language)}
+              {kycData?.id_card_url ? (
+                <a 
+                  href={kycData.id_card_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  {getTranslation('viewDocument', language)}
+                </a>
+              ) : (
+                getTranslation('notUploaded', language)
+              )}
             </p>
           </div>
+          {kycData?.status === 'rejected' && (
+            <div className="md:col-span-2">
+              <h3 className="text-sm font-medium mb-2 flex items-center text-red-600">
+                <X className="h-4 w-4 mr-2" />
+                {getTranslation('rejectionReason', language)}
+              </h3>
+              <p className="text-sm text-red-600 border border-red-200 p-2 rounded-md bg-red-50 dark:bg-red-900/10 dark:border-red-900/30">
+                {kycData.admin_notes || getTranslation('noReasonProvided', language)}
+              </p>
+            </div>
+          )}
         </div>
         
-        {!kycData.isPending && (
+        {kycData?.status !== 'approved' && (
           <Button 
             className="mt-4" 
             onClick={() => setKycDialogOpen(true)}
           >
-            {kycData.isVerified ? (
+            {kycData ? (
               <>
                 <Edit2 className="h-4 w-4 mr-2" />
                 {getTranslation('updateKYC', language)}
@@ -244,7 +403,6 @@ const KYCVerificationSection: React.FC = () => {
         )}
       </div>
 
-      {/* KYC Dialog */}
       <Dialog open={kycDialogOpen} onOpenChange={setKycDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -256,12 +414,12 @@ const KYCVerificationSection: React.FC = () => {
           <form onSubmit={handleKYCSubmit} className="space-y-4 py-4">
             <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
-                <label htmlFor="fullName" className="text-sm font-medium">{getTranslation('fullName', language)}</label>
+                <label htmlFor="full_name" className="text-sm font-medium">{getTranslation('fullName', language)}</label>
                 <Input
-                  id="fullName"
-                  name="fullName"
+                  id="full_name"
+                  name="full_name"
                   placeholder={getTranslation('enterFullName', language)}
-                  value={kycFormData.fullName}
+                  value={formData.full_name}
                   onChange={handleInputChange}
                   disabled={uploading}
                   required
@@ -275,7 +433,7 @@ const KYCVerificationSection: React.FC = () => {
                   name="email"
                   type="email"
                   placeholder={getTranslation('enterEmail', language)}
-                  value={kycFormData.email}
+                  value={formData.email}
                   onChange={handleInputChange}
                   disabled={uploading}
                   required
@@ -288,7 +446,7 @@ const KYCVerificationSection: React.FC = () => {
                   id="mobile"
                   name="mobile"
                   placeholder={getTranslation('enterMobile', language)}
-                  value={kycFormData.mobile}
+                  value={formData.mobile}
                   onChange={handleInputChange}
                   disabled={uploading}
                   required
@@ -301,7 +459,7 @@ const KYCVerificationSection: React.FC = () => {
                   id="country"
                   name="country"
                   placeholder={getTranslation('enterCountry', language)}
-                  value={kycFormData.country}
+                  value={formData.country}
                   onChange={handleInputChange}
                   disabled={uploading}
                   required
@@ -314,7 +472,7 @@ const KYCVerificationSection: React.FC = () => {
                   id="address"
                   name="address"
                   placeholder={getTranslation('enterAddress', language)}
-                  value={kycFormData.address}
+                  value={formData.address}
                   onChange={handleInputChange}
                   disabled={uploading}
                   required
@@ -322,20 +480,32 @@ const KYCVerificationSection: React.FC = () => {
               </div>
               
               <div className="space-y-2">
-                <label htmlFor="idCard" className="text-sm font-medium">{getTranslation('idCard', language)}</label>
+                <label htmlFor="id_card_file" className="text-sm font-medium">
+                  {getTranslation('idCard', language)}
+                  {!kycData && <span className="text-red-500">*</span>}
+                  {kycData && <span className="text-muted-foreground text-xs ml-2">({getTranslation('optionalIfAlreadyUploaded', language)})</span>}
+                </label>
                 <div className="flex items-center space-x-2">
                   <Input
-                    id="idCard"
+                    id="id_card_file"
                     type="file"
-                    accept="image/*"
+                    accept="image/*,.pdf"
                     onChange={handleIdCardUpload}
                     disabled={uploading}
                     className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-primary file:text-white hover:file:bg-primary/90"
+                    required={!kycData}
                   />
                 </div>
-                {kycFormData.idCardFile && (
+                {formData.id_card_file && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    {getTranslation('selectedFile', language)}: {kycFormData.idCardFile}
+                    {getTranslation('selectedFile', language)}: {formData.id_card_file.name}
+                  </p>
+                )}
+                {kycData?.id_card_url && !formData.id_card_file && (
+                  <p className="text-xs text-primary mt-1">
+                    <a href={kycData.id_card_url} target="_blank" rel="noopener noreferrer">
+                      {getTranslation('viewCurrentDocument', language)}
+                    </a>
                   </p>
                 )}
               </div>
@@ -363,7 +533,6 @@ const KYCVerificationSection: React.FC = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Success Dialog */}
       <Dialog open={successDialogOpen} onOpenChange={setSuccessDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
