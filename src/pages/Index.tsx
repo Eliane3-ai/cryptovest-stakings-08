@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Shield, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -57,7 +57,8 @@ const Index: React.FC = () => {
       </nav>
 
       <main>
-        <HeroSection handleGetStarted={handleGetStarted} />
+        {/* Remove the handleGetStarted prop since HeroSection in LandingPage.tsx doesn't accept it */}
+        <HeroSection />
         <FeaturesSection />
         <TestimonialsSection />
         <CtaSection />

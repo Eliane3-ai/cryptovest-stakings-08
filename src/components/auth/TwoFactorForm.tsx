@@ -34,6 +34,13 @@ const TwoFactorForm: React.FC<TwoFactorFormProps> = ({
     ? "w-full bg-yellow-400 hover:bg-yellow-500 text-black transform scale-95 transition-all duration-200" 
     : "w-full bg-[#F0B90B] hover:bg-[#F0B90B]/90 text-black transition-all duration-200";
 
+  // These event handlers are memoized to prevent re-renders
+  const handleMouseDown = () => setIsButtonPressed(true);
+  const handleMouseUp = () => setIsButtonPressed(false);
+  const handleMouseLeave = () => setIsButtonPressed(false);
+  const handleTouchStart = () => setIsButtonPressed(true);
+  const handleTouchEnd = () => setIsButtonPressed(false);
+
   return (
     <form onSubmit={handleSubmit} className="px-6 py-4">
       <div className="flex justify-center mb-4">
@@ -74,11 +81,11 @@ const TwoFactorForm: React.FC<TwoFactorFormProps> = ({
           type="submit" 
           className={buttonStyle}
           disabled={code.length !== 6 || verifying}
-          onMouseDown={() => setIsButtonPressed(true)}
-          onMouseUp={() => setIsButtonPressed(false)}
-          onMouseLeave={() => setIsButtonPressed(false)}
-          onTouchStart={() => setIsButtonPressed(true)}
-          onTouchEnd={() => setIsButtonPressed(false)}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           {verifying ? 'Verifying...' : 'Verify Code'}
         </Button>
