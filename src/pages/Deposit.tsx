@@ -25,12 +25,12 @@ const Deposit: React.FC = () => {
           onClick={() => navigate('/wallet')}
         >
           <ArrowLeft className="h-4 w-4" />
-          {getTranslation('backToDashboard', language).toUpperCase()}
+          {getTranslation('Return, language).toUpperCase()}
         </Button>
         
         <div className="max-w-2xl mx-auto">
           <h1 className="text-2xl font-bold mb-6 text-white">
-            {getTranslation('depositFunds', language).toUpperCase()}
+            {getTranslation('Deposit Funds', language).toUpperCase()}
           </h1>
 
           <Alert className="mb-6 bg-[#F0B90B]/10 border-[#F0B90B]/30 text-white">
