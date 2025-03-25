@@ -10,20 +10,17 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslation } from '@/utils/translations';
 import { supabase } from '@/integrations/supabase/client';
 import { KycVerification } from '@/types/kyc';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 
 const KycVerificationAdmin: React.FC = () => {
   const { language } = useLanguage();
-  const { profile } = useAuth();
+  const { isAdmin } = useAdminAuth();
   const [verifications, setVerifications] = useState<KycVerification[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedVerification, setSelectedVerification] = useState<KycVerification | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [adminNotes, setAdminNotes] = useState('');
   const [processingAction, setProcessingAction] = useState(false);
-
-  // Check if user is admin
-  const isAdmin = profile?.staking_knowledge === 'expert';
 
   // Fetch all KYC verifications
   const fetchVerifications = async () => {
@@ -142,7 +139,7 @@ const KycVerificationAdmin: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto">
       <h1 className="text-2xl font-bold mb-6">KYC Verification Admin</h1>
       
       {verifications.length === 0 ? (

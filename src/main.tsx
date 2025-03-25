@@ -6,10 +6,32 @@ import './index.css';
 // Add performance measurement
 const startTime = performance.now();
 
+// Preload critical resources
+const preloadCriticalResources = () => {
+  // Preload important stylesheets, fonts or scripts
+  const resources = [
+    { type: 'style', href: '/src/index.css' }
+  ];
+  
+  resources.forEach(resource => {
+    if (resource.type === 'style') {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'style';
+      link.href = resource.href;
+      document.head.appendChild(link);
+    }
+  });
+};
+
 // Add error handling
 const renderApp = () => {
   try {
     console.log('Initializing application...');
+    
+    // Preload critical resources
+    preloadCriticalResources();
+    
     const rootElement = document.getElementById("root");
     
     if (!rootElement) {
@@ -24,12 +46,25 @@ const renderApp = () => {
       }
     });
     
-    console.log('Rendering App component...');
-    root.render(<App />);
+    // Prioritize rendering the main app
+    const renderTimeout = setTimeout(() => {
+      console.log('Rendering App component...');
+      root.render(<App />);
+      
+      // Log performance metrics
+      const loadTime = performance.now() - startTime;
+      console.log(`App rendered successfully in ${loadTime.toFixed(2)}ms`);
+    }, 0);
+
+    // Optimization: Use the browser's idle time to load non-critical resources
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(() => {
+        console.log('Running deferred initialization...');
+        // Load any non-critical features here
+      }, { timeout: 1000 });
+    }
     
-    // Log performance metrics
-    const loadTime = performance.now() - startTime;
-    console.log(`App rendered successfully in ${loadTime.toFixed(2)}ms`);
+    return () => clearTimeout(renderTimeout);
   } catch (error) {
     console.error('Fatal error during application initialization:', error);
     
@@ -48,14 +83,6 @@ const renderApp = () => {
     }
   }
 };
-
-// Preload critical resources
-if ('requestIdleCallback' in window) {
-  // Use requestIdleCallback to defer non-critical initialization
-  window.requestIdleCallback(() => {
-    console.log('Running deferred initialization...');
-  });
-}
 
 // Execute app rendering
 renderApp();

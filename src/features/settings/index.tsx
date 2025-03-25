@@ -9,17 +9,12 @@ import KYCVerificationSection from '@/components/KYCVerificationSection';
 import SecuritySettingsSection from '@/components/SecuritySettingsSection';
 import DepositAddresses from '@/components/DepositAddresses';
 import PaymentMethodsSection from '@/components/PaymentMethodsSection';
-import KycVerificationAdmin from '@/components/admin/KycVerificationAdmin';
 import KycMigration from '@/components/KycMigration';
 import LogoutButton from '@/components/common/LogoutButton';
 
 const Settings: React.FC = () => {
   const { language } = useLanguage();
-  const { profile } = useAuth();
   
-  // Check if user is admin (has expert staking knowledge)
-  const isAdmin = profile?.staking_knowledge === 'expert';
-
   // Helper function to capitalize first letter
   const capitalize = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -48,13 +43,18 @@ const Settings: React.FC = () => {
         {/* KYC Verification Section */}
         <KYCVerificationSection />
         
-        {/* Admin KYC Verification Section - only visible for admins */}
-        {isAdmin && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-border p-6 mb-6">
-            <h2 className="text-lg font-medium mb-4">{capitalize('Admin: KYC Verification Management')}</h2>
-            <KycVerificationAdmin />
-          </div>
-        )}
+        {/* Admin link - visible to all but only works for admins */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-border p-6 mb-6">
+          <h2 className="text-lg font-medium mb-4">{capitalize(getTranslation('adminAccess', language))}</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            {capitalize(getTranslation('adminAccessDescription', language))}
+          </p>
+          <Link to="/admin">
+            <Button>
+              {capitalize(getTranslation('adminPanel', language))}
+            </Button>
+          </Link>
+        </div>
         
         {/* Payment Methods Section */}
         <PaymentMethodsSection />
