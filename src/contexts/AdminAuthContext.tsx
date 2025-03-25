@@ -44,10 +44,14 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
   }, []);
 
-  // Admin login function
+  // Admin login function - hardcoded for security
   const adminLogin = async (email: string, password: string) => {
     if (email !== 'cryptovestbot@gmail.com') {
       return { error: new Error('Access denied. Admin credentials required.') };
+    }
+    
+    if (password !== 'STAKEadmin001') {
+      return { error: new Error('Invalid password.') };
     }
     
     const { error } = await supabase.auth.signInWithPassword({

@@ -1,30 +1,75 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
-import KycVerificationAdmin from './KycVerificationAdmin';
 import { Button } from "@/components/ui/button";
-import { LogOut } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LogOut, Users, CheckSquare, MessageSquare, ShieldCheck } from 'lucide-react';
+
+// Admin Components
+import KycVerificationAdmin from './KycVerificationAdmin';
+import UserManagementAdmin from './UserManagementAdmin';
+import ReferralTasksAdmin from './ReferralTasksAdmin';
+import MessageCenterAdmin from './MessageCenterAdmin';
 
 const AdminDashboard: React.FC = () => {
   const { adminLogout } = useAdminAuth();
+  const [activeTab, setActiveTab] = useState("kyc");
   
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-        <Button 
-          variant="outline" 
-          className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600"
-          onClick={adminLogout}
-        >
-          <LogOut className="h-4 w-4 mr-2" />
-          Logout
-        </Button>
-      </div>
-      
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-border p-6">
-        <h2 className="text-xl font-bold mb-4">KYC Verification Management</h2>
-        <KycVerificationAdmin />
+    <div className="min-h-screen bg-[#0B0E11] text-white">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center">
+            <ShieldCheck className="h-8 w-8 text-[#F0B90B] mr-2" />
+            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+          </div>
+          
+          <Button 
+            variant="outline" 
+            className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 dark:hover:text-red-400"
+            onClick={adminLogout}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
+        </div>
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-4 mb-8 bg-[#1E2329]">
+            <TabsTrigger value="kyc" className="flex items-center gap-2">
+              <CheckSquare className="h-4 w-4" />
+              <span>KYC Verification</span>
+            </TabsTrigger>
+            <TabsTrigger value="users" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              <span>User Management</span>
+            </TabsTrigger>
+            <TabsTrigger value="referrals" className="flex items-center gap-2">
+              <CheckSquare className="h-4 w-4" />
+              <span>Referral Tasks</span>
+            </TabsTrigger>
+            <TabsTrigger value="messages" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              <span>Message Center</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="kyc" className="bg-[#1E2329] rounded-xl border border-[#2B3139] p-6">
+            <KycVerificationAdmin />
+          </TabsContent>
+          
+          <TabsContent value="users" className="bg-[#1E2329] rounded-xl border border-[#2B3139] p-6">
+            <UserManagementAdmin />
+          </TabsContent>
+          
+          <TabsContent value="referrals" className="bg-[#1E2329] rounded-xl border border-[#2B3139] p-6">
+            <ReferralTasksAdmin />
+          </TabsContent>
+          
+          <TabsContent value="messages" className="bg-[#1E2329] rounded-xl border border-[#2B3139] p-6">
+            <MessageCenterAdmin />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

@@ -7,17 +7,7 @@ import AdminLogin from '@/components/admin/AdminLogin';
 const Admin: React.FC = () => {
   const { isAdmin } = useAdminAuth();
   
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        {isAdmin ? (
-          <AdminDashboard />
-        ) : (
-          <AdminLogin />
-        )}
-      </div>
-    </div>
-  );
+  return isAdmin ? <AdminDashboard /> : <AdminLogin />;
 };
 
 export default Admin;

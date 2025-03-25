@@ -26,6 +26,7 @@ import Settings from "./features/settings";
 
 // Admin Pages
 import Admin from "./features/admin";
+import AdminLogin from "./components/admin/AdminLogin";
 
 // Legacy pages (to be moved to feature folders later)
 import Market from "./pages/Market";
@@ -65,6 +66,7 @@ const App = () => (
                       <Route path="/" element={<LandingPage />} />
                       <Route path="/auth" element={<Auth />} />
                       <Route path="/contact" element={<Contact />} />
+                      <Route path="/admin/login" element={<AdminLogin />} />
                     </Route>
                     
                     {/* Protected Routes - require authentication */}
@@ -83,9 +85,7 @@ const App = () => (
                     </Route>
 
                     {/* Admin Routes - require admin authentication */}
-                    <Route element={<AdminRoute />}>
-                      <Route path="/admin" element={<Admin />} />
-                    </Route>
+                    <Route path="/admin" element={<Admin />} />
 
                     {/* Redirect to auth if not matched */}
                     <Route path="*" element={<NotFound />} />

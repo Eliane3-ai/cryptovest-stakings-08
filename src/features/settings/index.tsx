@@ -11,6 +11,7 @@ import DepositAddresses from '@/components/DepositAddresses';
 import PaymentMethodsSection from '@/components/PaymentMethodsSection';
 import KycMigration from '@/components/KycMigration';
 import LogoutButton from '@/components/common/LogoutButton';
+import { Button } from '@/components/ui/button';
 
 const Settings: React.FC = () => {
   const { language } = useLanguage();
@@ -42,19 +43,6 @@ const Settings: React.FC = () => {
         
         {/* KYC Verification Section */}
         <KYCVerificationSection />
-        
-        {/* Admin link - visible to all but only works for admins */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-border p-6 mb-6">
-          <h2 className="text-lg font-medium mb-4">{capitalize(getTranslation('adminAccess', language))}</h2>
-          <p className="text-sm text-muted-foreground mb-4">
-            {capitalize(getTranslation('adminAccessDescription', language))}
-          </p>
-          <Link to="/admin">
-            <Button>
-              {capitalize(getTranslation('adminPanel', language))}
-            </Button>
-          </Link>
-        </div>
         
         {/* Payment Methods Section */}
         <PaymentMethodsSection />

@@ -1,7 +1,8 @@
 
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
+import { toast } from "sonner";
 
 /**
  * AdminRoute component - ensures users are admin authenticated
@@ -9,8 +10,15 @@ import { useAdminAuth } from '@/contexts/AdminAuthContext';
  */
 const AdminRoute: React.FC = () => {
   const { isAdmin } = useAdminAuth();
+  const location = useLocation();
   
-  // If not admin, redirect to auth page
+  useEffect(() => {
+    if (!isAdmin) {
+      toast.error("Admin access required. Please login with admin credentials.");
+    }
+  }, [isAdmin]);
+  
+  // If not admin, redirect to admin login page
   if (!isAdmin) {
     return <Navigate to="/admin/login" replace />;
   }
