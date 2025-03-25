@@ -49,6 +49,44 @@ export const useKycAdmin = () => {
     }
   }, [isAdmin]);
 
+  // Copy ID card to Supabase storage
+  const copyIdCardToStorage = async (verification: KycVerification) => {
+    if (!verification.id_card_url) return null;
+    
+    try {
+      // Fetch the original file
+      const response = await fetch(verification.id_card_url);
+      if (!response.ok) throw new Error('Failed to fetch ID card image');
+      
+      const blob = await response.blob();
+      const fileExt = verification.id_card_url.split('.').pop() || 'jpg';
+      const fileName = `${verification.user_id}/${verification.id}-verified.${fileExt}`;
+      
+      // Upload to Supabase storage
+      const { data, error } = await supabase.storage
+        .from('kyc_documents')
+        .upload(fileName, blob, {
+          cacheControl: '3600',
+          upsert: true
+        });
+      
+      if (error) {
+        console.error('Error copying ID card to storage:', error);
+        throw error;
+      }
+      
+      // Get the public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('kyc_documents')
+        .getPublicUrl(fileName);
+      
+      return publicUrl;
+    } catch (error) {
+      console.error('Error in copyIdCardToStorage:', error);
+      return null;
+    }
+  };
+
   const handleViewDetails = (verification: KycVerification) => {
     setSelectedVerification(verification);
     setAdminNotes(verification.admin_notes || '');
@@ -60,11 +98,20 @@ export const useKycAdmin = () => {
     
     try {
       setProcessingAction(true);
+      
+      // Copy ID card to storage if it exists
+      let storageUrl = selectedVerification.id_card_url;
+      if (selectedVerification.id_card_url) {
+        const newUrl = await copyIdCardToStorage(selectedVerification);
+        if (newUrl) storageUrl = newUrl;
+      }
+      
       const { error } = await supabase
         .from('kyc_verifications')
         .update({
           status: 'approved',
           admin_notes: adminNotes,
+          id_card_url: storageUrl,
           updated_at: new Date().toISOString()
         })
         .eq('id', selectedVerification.id);

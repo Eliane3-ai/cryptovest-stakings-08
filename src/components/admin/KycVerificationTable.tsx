@@ -20,31 +20,32 @@ const KycVerificationTable: React.FC<KycVerificationTableProps> = ({
   const { language } = useLanguage();
   
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-border overflow-hidden">
+    <div className="bg-[#1E2026] border-[#2B3139] border rounded-xl overflow-hidden">
       <Table>
-        <TableHeader>
+        <TableHeader className="bg-[#2B3139]">
           <TableRow>
-            <TableHead>{getTranslation('user', language)}</TableHead>
-            <TableHead>{getTranslation('fullName', language)}</TableHead>
-            <TableHead>{getTranslation('status', language)}</TableHead>
-            <TableHead>{getTranslation('submittedDate', language)}</TableHead>
-            <TableHead>{getTranslation('actions', language)}</TableHead>
+            <TableHead className="text-[#F0B90B]">{getTranslation('user', language).toUpperCase()}</TableHead>
+            <TableHead className="text-[#F0B90B]">{getTranslation('fullName', language).toUpperCase()}</TableHead>
+            <TableHead className="text-[#F0B90B]">{getTranslation('status', language).toUpperCase()}</TableHead>
+            <TableHead className="text-[#F0B90B]">{getTranslation('submittedDate', language).toUpperCase()}</TableHead>
+            <TableHead className="text-[#F0B90B]">{getTranslation('actions', language).toUpperCase()}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {verifications.map((verification) => (
-            <TableRow key={verification.id}>
-              <TableCell className="font-medium">{verification.user_id.substring(0, 8)}...</TableCell>
-              <TableCell>{verification.full_name}</TableCell>
+            <TableRow key={verification.id} className="border-b border-[#2B3139] hover:bg-[#2B3139]/30">
+              <TableCell className="font-medium text-white">{verification.user_id.substring(0, 8)}...</TableCell>
+              <TableCell className="text-white">{verification.full_name}</TableCell>
               <TableCell>
                 <KycStatusBadge status={verification.status} />
               </TableCell>
-              <TableCell>{new Date(verification.created_at).toLocaleDateString()}</TableCell>
+              <TableCell className="text-white">{new Date(verification.created_at).toLocaleDateString()}</TableCell>
               <TableCell>
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={() => onViewDetails(verification)}
+                  className="border-[#F0B90B] text-[#F0B90B] hover:bg-[#F0B90B]/10"
                 >
                   <Eye className="h-4 w-4 mr-2" />
                   {getTranslation('view', language)}

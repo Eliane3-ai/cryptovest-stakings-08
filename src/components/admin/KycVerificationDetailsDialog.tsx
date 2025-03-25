@@ -35,63 +35,63 @@ const KycVerificationDetailsDialog: React.FC<KycVerificationDetailsDialogProps> 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-xl bg-[#1E2026] border-[#2B3139] text-white">
         <DialogHeader>
-          <DialogTitle>{getTranslation('kycVerificationDetails', language)}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-[#F0B90B]">{getTranslation('kycVerificationDetails', language).toUpperCase()}</DialogTitle>
+          <DialogDescription className="text-[#848E9C]">
             {getTranslation('reviewKycDetails', language)}
           </DialogDescription>
         </DialogHeader>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
           <div>
-            <h3 className="text-sm font-medium mb-1">{getTranslation('fullName', language)}</h3>
-            <p className="text-sm border p-2 rounded-md">{verification.full_name}</p>
+            <h3 className="text-sm font-medium mb-1 text-[#E6E8EA]">{getTranslation('fullName', language).toUpperCase()}</h3>
+            <p className="text-sm border border-[#2B3139] bg-[#2B3139]/50 p-2 rounded-md text-[#848E9C]">{verification.full_name}</p>
           </div>
           <div>
-            <h3 className="text-sm font-medium mb-1">{getTranslation('emailAddress', language)}</h3>
-            <p className="text-sm border p-2 rounded-md">{verification.email}</p>
+            <h3 className="text-sm font-medium mb-1 text-[#E6E8EA]">{getTranslation('emailAddress', language).toUpperCase()}</h3>
+            <p className="text-sm border border-[#2B3139] bg-[#2B3139]/50 p-2 rounded-md text-[#848E9C]">{verification.email}</p>
           </div>
           <div>
-            <h3 className="text-sm font-medium mb-1">{getTranslation('mobileNumber', language)}</h3>
-            <p className="text-sm border p-2 rounded-md">{verification.mobile}</p>
+            <h3 className="text-sm font-medium mb-1 text-[#E6E8EA]">{getTranslation('mobileNumber', language).toUpperCase()}</h3>
+            <p className="text-sm border border-[#2B3139] bg-[#2B3139]/50 p-2 rounded-md text-[#848E9C]">{verification.mobile}</p>
           </div>
           <div>
-            <h3 className="text-sm font-medium mb-1">{getTranslation('country', language)}</h3>
-            <p className="text-sm border p-2 rounded-md">{verification.country}</p>
+            <h3 className="text-sm font-medium mb-1 text-[#E6E8EA]">{getTranslation('country', language).toUpperCase()}</h3>
+            <p className="text-sm border border-[#2B3139] bg-[#2B3139]/50 p-2 rounded-md text-[#848E9C]">{verification.country}</p>
           </div>
           <div className="md:col-span-2">
-            <h3 className="text-sm font-medium mb-1">{getTranslation('address', language)}</h3>
-            <p className="text-sm border p-2 rounded-md">{verification.address}</p>
+            <h3 className="text-sm font-medium mb-1 text-[#E6E8EA]">{getTranslation('address', language).toUpperCase()}</h3>
+            <p className="text-sm border border-[#2B3139] bg-[#2B3139]/50 p-2 rounded-md text-[#848E9C]">{verification.address}</p>
           </div>
           <div className="md:col-span-2">
-            <h3 className="text-sm font-medium mb-1">{getTranslation('idCard', language)}</h3>
+            <h3 className="text-sm font-medium mb-1 text-[#E6E8EA]">{getTranslation('idCard', language).toUpperCase()}</h3>
             {verification.id_card_url ? (
-              <div className="border rounded-md p-2">
+              <div className="border border-[#2B3139] bg-[#2B3139]/50 p-2 rounded-md">
                 <a 
                   href={verification.id_card_url} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline flex items-center"
+                  className="text-[#F0B90B] hover:underline flex items-center"
                 >
                   <Eye className="h-4 w-4 mr-2" />
                   {getTranslation('viewDocument', language)}
                 </a>
               </div>
             ) : (
-              <p className="text-sm border p-2 rounded-md text-red-500">
+              <p className="text-sm border border-[#2B3139] bg-[#2B3139]/50 p-2 rounded-md text-red-500">
                 {getTranslation('noDocumentUploaded', language)}
               </p>
             )}
           </div>
           <div className="md:col-span-2">
-            <h3 className="text-sm font-medium mb-1">{getTranslation('adminNotes', language)}</h3>
+            <h3 className="text-sm font-medium mb-1 text-[#E6E8EA]">{getTranslation('adminNotes', language).toUpperCase()}</h3>
             <Textarea
               value={adminNotes}
               onChange={(e) => onAdminNotesChange(e.target.value)}
               placeholder={getTranslation('enterAdminNotes', language)}
               rows={3}
-              className="w-full"
+              className="w-full bg-[#2B3139] border-[#474D57] text-white"
               disabled={processingAction}
             />
           </div>
@@ -104,18 +104,18 @@ const KycVerificationDetailsDialog: React.FC<KycVerificationDetailsDialogProps> 
                 variant="outline"
                 onClick={onReject}
                 disabled={processingAction}
-                className="bg-red-50 hover:bg-red-100 text-red-600 border-red-200"
+                className="bg-[#2B3139] hover:bg-[#F6465D]/10 text-[#F6465D] border-[#F6465D]/30"
               >
                 <X className="h-4 w-4 mr-2" />
-                {processingAction ? getTranslation('processing', language) : getTranslation('reject', language)}
+                {processingAction ? getTranslation('processing', language) : getTranslation('reject', language).toUpperCase()}
               </Button>
               <Button
                 onClick={onApprove}
                 disabled={processingAction}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-[#0ECB81] hover:bg-[#0ECB81]/90 text-black"
               >
                 <CheckCircle className="h-4 w-4 mr-2" />
-                {processingAction ? getTranslation('processing', language) : getTranslation('approve', language)}
+                {processingAction ? getTranslation('processing', language) : getTranslation('approve', language).toUpperCase()}
               </Button>
             </>
           )}
@@ -123,8 +123,9 @@ const KycVerificationDetailsDialog: React.FC<KycVerificationDetailsDialogProps> 
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={processingAction}
+            className="border-[#474D57] text-white hover:bg-[#2B3139]"
           >
-            {getTranslation('close', language)}
+            {getTranslation('close', language).toUpperCase()}
           </Button>
         </div>
       </DialogContent>

@@ -11,7 +11,6 @@ import DepositAddresses from '@/components/DepositAddresses';
 import PaymentMethodsSection from '@/components/PaymentMethodsSection';
 import KycMigration from '@/components/KycMigration';
 import LogoutButton from '@/components/common/LogoutButton';
-import { Button } from '@/components/ui/button';
 
 const Settings: React.FC = () => {
   const { language } = useLanguage();
@@ -33,7 +32,7 @@ const Settings: React.FC = () => {
           <LogoutButton variant="destructive" />
         </div>
 
-        <h1 className="text-2xl font-bold mb-6 text-white">{capitalize(getTranslation('settings', language))}</h1>
+        <h1 className="text-2xl font-bold mb-6 text-white">{getTranslation('settings', language).toUpperCase()}</h1>
 
         {/* Migration component - will only show if migration is needed */}
         <KycMigration />

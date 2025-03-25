@@ -21,36 +21,48 @@ const AdminDashboard: React.FC = () => {
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
             <ShieldCheck className="h-8 w-8 text-[#F0B90B] mr-2" />
-            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+            <h1 className="text-2xl font-bold">ADMIN Dashboard</h1>
           </div>
           
           <Button 
             variant="outline" 
-            className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 dark:hover:text-red-400"
+            className="text-red-500 border-red-200 hover:bg-red-950 hover:text-red-400"
             onClick={adminLogout}
           >
             <LogOut className="h-4 w-4 mr-2" />
-            Logout
+            LOGOUT
           </Button>
         </div>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-4 mb-8 bg-[#1E2329]">
-            <TabsTrigger value="kyc" className="flex items-center gap-2">
+          <TabsList className="grid grid-cols-4 mb-8 bg-[#1E2329] border border-[#2B3139]">
+            <TabsTrigger 
+              value="kyc" 
+              className="flex items-center gap-2 data-[state=active]:bg-[#F0B90B] data-[state=active]:text-[#0B0E11]"
+            >
               <CheckSquare className="h-4 w-4" />
-              <span>KYC Verification</span>
+              <span>KYC VERIFICATION</span>
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="users" 
+              className="flex items-center gap-2 data-[state=active]:bg-[#F0B90B] data-[state=active]:text-[#0B0E11]"
+            >
               <Users className="h-4 w-4" />
-              <span>User Management</span>
+              <span>USER Management</span>
             </TabsTrigger>
-            <TabsTrigger value="referrals" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="referrals" 
+              className="flex items-center gap-2 data-[state=active]:bg-[#F0B90B] data-[state=active]:text-[#0B0E11]"
+            >
               <CheckSquare className="h-4 w-4" />
-              <span>Referral Tasks</span>
+              <span>REFERRAL Tasks</span>
             </TabsTrigger>
-            <TabsTrigger value="messages" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="messages" 
+              className="flex items-center gap-2 data-[state=active]:bg-[#F0B90B] data-[state=active]:text-[#0B0E11]"
+            >
               <MessageSquare className="h-4 w-4" />
-              <span>Message Center</span>
+              <span>MESSAGE Center</span>
             </TabsTrigger>
           </TabsList>
           

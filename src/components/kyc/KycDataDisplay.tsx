@@ -17,7 +17,7 @@ const KycDataDisplay: React.FC<KycDataDisplayProps> = ({ kycData }) => {
       <div>
         <h3 className="text-sm font-medium mb-2 flex items-center text-[#E6E8EA]">
           <User className="h-4 w-4 mr-2 text-[#F0B90B]" />
-          {getTranslation('fullName', language)}
+          {getTranslation('fullName', language).toUpperCase()}
         </h3>
         <p className="text-sm text-[#848E9C] border border-[#2B3139] bg-[#2B3139]/50 p-2 rounded-md">
           {kycData?.full_name || getTranslation('notProvided', language)}
@@ -26,7 +26,7 @@ const KycDataDisplay: React.FC<KycDataDisplayProps> = ({ kycData }) => {
       <div>
         <h3 className="text-sm font-medium mb-2 flex items-center text-[#E6E8EA]">
           <Globe className="h-4 w-4 mr-2 text-[#F0B90B]" />
-          {getTranslation('emailAddress', language)}
+          {getTranslation('emailAddress', language).toUpperCase()}
         </h3>
         <p className="text-sm text-[#848E9C] border border-[#2B3139] bg-[#2B3139]/50 p-2 rounded-md">
           {kycData?.email || getTranslation('notProvided', language)}
@@ -35,7 +35,7 @@ const KycDataDisplay: React.FC<KycDataDisplayProps> = ({ kycData }) => {
       <div>
         <h3 className="text-sm font-medium mb-2 flex items-center text-[#E6E8EA]">
           <Phone className="h-4 w-4 mr-2 text-[#F0B90B]" />
-          {getTranslation('mobileNumber', language)}
+          {getTranslation('mobileNumber', language).toUpperCase()}
         </h3>
         <p className="text-sm text-[#848E9C] border border-[#2B3139] bg-[#2B3139]/50 p-2 rounded-md">
           {kycData?.mobile || getTranslation('notProvided', language)}
@@ -44,7 +44,7 @@ const KycDataDisplay: React.FC<KycDataDisplayProps> = ({ kycData }) => {
       <div>
         <h3 className="text-sm font-medium mb-2 flex items-center text-[#E6E8EA]">
           <Globe className="h-4 w-4 mr-2 text-[#F0B90B]" />
-          {getTranslation('country', language)}
+          {getTranslation('country', language).toUpperCase()}
         </h3>
         <p className="text-sm text-[#848E9C] border border-[#2B3139] bg-[#2B3139]/50 p-2 rounded-md">
           {kycData?.country || getTranslation('notProvided', language)}
@@ -53,7 +53,7 @@ const KycDataDisplay: React.FC<KycDataDisplayProps> = ({ kycData }) => {
       <div className="md:col-span-2">
         <h3 className="text-sm font-medium mb-2 flex items-center text-[#E6E8EA]">
           <MapPin className="h-4 w-4 mr-2 text-[#F0B90B]" />
-          {getTranslation('address', language)}
+          {getTranslation('address', language).toUpperCase()}
         </h3>
         <p className="text-sm text-[#848E9C] border border-[#2B3139] bg-[#2B3139]/50 p-2 rounded-md">
           {kycData?.address || getTranslation('notProvided', language)}
@@ -62,7 +62,7 @@ const KycDataDisplay: React.FC<KycDataDisplayProps> = ({ kycData }) => {
       <div>
         <h3 className="text-sm font-medium mb-2 flex items-center text-[#E6E8EA]">
           <CreditCard className="h-4 w-4 mr-2 text-[#F0B90B]" />
-          {getTranslation('idCard', language)}
+          {getTranslation('idCard', language).toUpperCase()}
         </h3>
         <p className="text-sm text-[#848E9C] border border-[#2B3139] bg-[#2B3139]/50 p-2 rounded-md">
           {kycData?.id_card_url ? (
@@ -83,7 +83,7 @@ const KycDataDisplay: React.FC<KycDataDisplayProps> = ({ kycData }) => {
         <div className="md:col-span-2">
           <h3 className="text-sm font-medium mb-2 flex items-center text-[#F6465D]">
             <X className="h-4 w-4 mr-2" />
-            {getTranslation('rejectionReason', language)}
+            {getTranslation('rejectionReason', language).toUpperCase()}
           </h3>
           <p className="text-sm text-[#F6465D] border border-[#F6465D]/20 p-2 rounded-md bg-[#F6465D]/10">
             {kycData?.admin_notes || getTranslation('noReasonProvided', language)}
