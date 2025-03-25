@@ -40,18 +40,18 @@ const KYCVerificationSection: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-border p-6 mb-6">
+      <div className="bg-[#1E2026] border-[#2B3139] rounded-xl p-6 mb-6 text-white">
         <div className="flex justify-center items-center p-10">
-          <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <span className="ml-2">{getTranslation('loading', language)}</span>
+          <Loader2 className="h-10 w-10 animate-spin text-[#F0B90B]" />
+          <span className="ml-2 text-[#F0B90B]">{getTranslation('loading', language)}</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-border p-6 mb-6">
-      <h2 className="text-lg font-medium mb-4">{getTranslation('kycVerification', language)}</h2>
+    <div className="bg-[#1E2026] border-[#2B3139] rounded-xl p-6 mb-6 text-white">
+      <h2 className="text-lg font-medium mb-4 text-[#F0B90B]">{getTranslation('kycVerification', language)}</h2>
       
       <KycStatusDisplay kycData={kycData} />
       
@@ -60,7 +60,7 @@ const KYCVerificationSection: React.FC = () => {
         
         {kycData?.status !== 'approved' && (
           <Button 
-            className="mt-4" 
+            className="mt-4 bg-[#F0B90B] text-[#0B0E11] hover:bg-[#F0B90B]/90" 
             onClick={() => setKycDialogOpen(true)}
           >
             {kycData ? (
@@ -79,10 +79,10 @@ const KYCVerificationSection: React.FC = () => {
       </div>
 
       <Dialog open={kycDialogOpen} onOpenChange={setKycDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-[#1E2026] border-[#2B3139] text-white">
           <DialogHeader>
-            <DialogTitle>{getTranslation('kycVerification', language)}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-[#F0B90B]">{getTranslation('kycVerification', language)}</DialogTitle>
+            <DialogDescription className="text-[#848E9C]">
               {getTranslation('kycDescription', language)}
             </DialogDescription>
           </DialogHeader>

@@ -22,10 +22,10 @@ const Settings: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#0B0E11]">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="mb-6 flex items-center justify-between">
-          <Link to="/wallet" className="flex items-center text-muted-foreground hover:text-foreground">
+          <Link to="/wallet" className="flex items-center text-[#848E9C] hover:text-white">
             <ArrowLeft className="h-5 w-5 mr-2" />
             <span>{capitalize(getTranslation('backToWallet', language))}</span>
           </Link>
@@ -33,7 +33,7 @@ const Settings: React.FC = () => {
           <LogoutButton variant="destructive" />
         </div>
 
-        <h1 className="text-2xl font-bold mb-6">{capitalize(getTranslation('settings', language))}</h1>
+        <h1 className="text-2xl font-bold mb-6 text-white">{capitalize(getTranslation('settings', language))}</h1>
 
         {/* Migration component - will only show if migration is needed */}
         <KycMigration />
