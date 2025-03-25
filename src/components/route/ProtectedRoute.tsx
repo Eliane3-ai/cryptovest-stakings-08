@@ -41,14 +41,7 @@ const ProtectedRoute: React.FC = () => {
   
   // If user is not authenticated, redirect to auth page
   if (!user) {
-    // Show toast notification
-    toast({
-      title: "Authentication Required",
-      description: "Please sign in to access this feature",
-      variant: "destructive",
-    });
-    
-    // Redirect to auth page with return URL
+    // We'll move the toast notification to useEffect to prevent render loop
     return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
   }
   

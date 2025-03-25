@@ -85,7 +85,9 @@ const App = () => (
                     </Route>
 
                     {/* Admin Routes - require admin authentication */}
-                    <Route path="/admin" element={<Admin />} />
+                    <Route element={<AdminRoute />}>
+                      <Route path="/admin" element={<Admin />} />
+                    </Route>
 
                     {/* Redirect to auth if not matched */}
                     <Route path="*" element={<NotFound />} />
